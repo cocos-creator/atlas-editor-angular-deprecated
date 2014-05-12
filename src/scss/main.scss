@@ -1,0 +1,64 @@
+$right-sidebar-width: 240px;
+$left-sidebar-width: 48px;
+
+html {
+    background: url(/bin/img/bg-linen.jpg) 50% top;
+}
+
+body {
+    background: transparent;
+}
+
+#atlas-canvas {
+    background: url(/bin/img/checkerboard.png);
+    display: block;
+    margin: auto;
+    margin-top: 20px;
+    box-shadow: 5px 5px 5px 0 rgba(0,0,0,0.2);
+    border: 2px solid #000;
+    box-sizing: content-box;
+    transition: border-color 0.5s;
+}
+
+.atlas-item {
+    background-color: rgba( 0, 128, 255, 0.5 );
+    margin: 2px;
+}
+.atlas-item:hover {
+    outline: 1px solid #000;
+}
+
+.panel {
+    background-color: #171717;
+    border: 1px solid #000;
+    color: white;
+}
+
+.workspace {
+    height: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    margin-right: $right-sidebar-width;
+    margin-left: $left-sidebar-width;
+}
+
+.left.sidebar {
+    position: fixed;
+    width: $left-sidebar-width;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: 2px 0 3px 0 rgba(0,0,0,0.2)
+}
+
+.right.sidebar {
+    position: fixed;
+    width: $right-sidebar-width;;
+    height: 100%;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    box-shadow: -2px 0 3px 0 rgba(0,0,0,0.2)
+}

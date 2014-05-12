@@ -1,0 +1,70 @@
+<html>
+
+<head>
+<title>Atlas Editor</title>
+<link rel="stylesheet" href="/bin/css/normalize.css">
+<link rel="stylesheet" href="/bin/css/foundation.css">
+<link rel="stylesheet" href="/bin/css/main.css">
+
+<script type="text/javascript" src="/bin/js/angular/angular.js"></script>
+<script type="text/javascript" src="/bin/js/fireball-core/core.dev.js"></script>
+<script type="text/javascript" src="/bin/js/atlas-editor.dev.js"></script>
+</head>
+
+<body>
+
+    <div id="workspace" class="workspace">
+        <canvas id="atlas-canvas"></canvas>
+    </div>
+
+    <div id="left-sidebar" class="panel left sidebar">
+    </div>
+
+    <div ng-controller="AtlasCtrl" id="right-sidebar" class="panel right sidebar">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Width</td>
+                    <td><select ng-model="atlas.width" ng-options="size for size in sizes"></select></td>
+                </tr>
+                <tr>
+                    <td>Height</td>
+                    <td><select ng-model="atlas.height" ng-options="size for size in sizes"></select></td>
+                </tr>
+                <tr>                                                                                                                                            
+                    <td>Trim</td>
+                    <td><input type="checkbox" ng-model="atlas.trim"></td>
+                </tr>                                                                                                                                           
+                <tr>                                                                                                                                            
+                    <td>Trim Threshold</td>
+                    <td><input type="number" ng-model="atlas.trimThreshold"></td>
+                </tr>                                                                                                                                           
+                <tr>                                                                                                                                            
+                    <td>Algorithm</td>
+                    <td><select ng-model="atlas.algorithm" ng-options="item.value as item.name for item in algorithmList" ng-change="layout()"></select></td>
+                </tr>                                                                                                                                           
+                <tr>                                                                                                                                            
+                    <td>Sort By</td>
+                    <td><select ng-model="atlas.sortBy" ng-options="item.value as item.name for item in sortByList" ng-change="layout()"></select></td>
+                </tr>                                                                                                                                           
+                <tr>                                                                                                                                            
+                    <td>Sort Order</td>
+                    <td><select ng-model="atlas.sortOrder" ng-options="item.value as item.name for item in sortOrderList" ng-change="layout()"></select></td>
+                </tr>                                                                                                                                           
+                <tr>                                                                                                                                            
+                    <td>Custom Padding</td>
+                    <td><input type="number" ng-model="atlas.customPadding" ng-change="layout()"></td>
+                </tr>                                                                                                                                           
+                <tr>                                                                                                                                            
+                    <td>Allow Rotate</td>
+                    <td><input type="checkbox" ng-model="atlas.allowRotate" ng-change="layout()"></td>
+                </tr>                                                                                                                                           
+            </tbody>
+        </table>
+
+        <button ng-click="export()">Export Atlas</button>                                              
+    </div>
+
+</body>
+
+</html>

@@ -31,14 +31,25 @@ function AtlasCtrl($scope) {
         app.atlasEditor.repaint();
     };
 
-    $scope.export = function () {
-        var canvas = app.atlasEditor.paintNewCanvas();
-        var data = canvas.toDataURL("image/png");
+    var download = function (url, filename) {
         var a = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
-        a.href = data;
-        a.download = name + ".png";
+        a.href = url;
+        a.download = filename;
         var event = document.createEvent("MouseEvents");
         event.initMouseEvent("click", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
         a.dispatchEvent(event);
+    };
+
+    $scope.export = function () {
+        var dataURL;
+        // export json
+        var json = FIRE.serialize(app.atlasEditor.atlas);
+        var blob = new Blob([json], {type: "text/plain;charset=utf-8"});    // not support 'application/json'
+        dataURL = (window.URL || window.webkitURL).createObjectURL(blob);
+        download(dataURL, name + ".json");
+        // export png
+        var canvas = app.atlasEditor.paintNewCanvas();
+        dataURL = canvas.toDataURL("image/png");
+        download(dataURL, name + ".png");
     };
 }

@@ -6,7 +6,7 @@
     "license": "MIT",
     "licenseUrl": "http://opensource.org/licenses/MIT",
     "dependencies": {
-        "connect": ""
+        "express": ""
     },
     "devDependencies": {
         "grunt": "",

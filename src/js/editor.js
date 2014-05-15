@@ -17,21 +17,25 @@ var AtlasEditor = (function () {
 
         var img = new Image();
         img.classList.add('atlas-item');
+
+        var self = this;
+        img.onload = function () {
+            var texture = new FIRE.SpriteTexture(img);
+            texture.name = e.target.filename;
+
+            if (self.atlas.trim) {
+                var trimRect = FIRE.getTrimRect(img, self.atlas.trimThreshold);
+                texture.trimX = trimRect.x;
+                texture.trimY = trimRect.y;
+                texture.width = trimRect.width;
+                texture.height = trimRect.height;
+            }
+
+            self.atlas.add(texture);
+            _processing -= 1;
+        };
+
         img.src = e.target.result;
-
-        var texture = new FIRE.SpriteTexture(img);
-        texture.name = e.target.filename;
-
-        if ( this.atlas.trim ) {
-            var trimRect = FIRE.getTrimRect(img, this.atlas.trimThreshold);
-            texture.trimX = trimRect.x;
-            texture.trimY = trimRect.y;
-            texture.width = trimRect.width;
-            texture.height = trimRect.height;
-        }
-
-        this.atlas.add(texture);
-        _processing -= 1;
     };
 
     //

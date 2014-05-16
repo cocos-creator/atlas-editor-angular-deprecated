@@ -29,7 +29,7 @@ app.get('/test', function(req, res){
 
 // serves all the static files
 app.get(/^(.+)$/, function(req, res){ 
-    console.log('static file request : ' + req.params);
+    // console.log('static file request : ' + req.params);
     res.sendfile( __dirname + req.params[0]); 
 });
 

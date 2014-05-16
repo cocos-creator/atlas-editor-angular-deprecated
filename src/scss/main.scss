@@ -9,6 +9,18 @@ body {
     background: transparent;
 }
 
+* {
+    font-family: Arial;
+    box-sizing: border-box;
+
+    pointer-events: none;
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
 #atlas-canvas {
     background: url(/bin/img/checkerboard.png);
     display: block;
@@ -63,7 +75,55 @@ body {
     box-shadow: -2px 0 3px 0 rgba(0,0,0,0.2)
 }
 
-/* .tabs {                          */
-/*     border-top: 1px solid black; */
-/*     height: 31px;                */
-/* }                                */
+// ------------------------------------------
+
+.clearfix {                         
+    clear: both;
+}
+
+.tabs {                         
+    border-top: 1px solid black;
+    height: 31px;               
+}                               
+
+.section>.body {                         
+    position: relative;
+    background-color: #333;
+    padding: 8px;
+}
+
+.field {                         
+    position: relative;
+    padding: 4px 0;
+    white-space: nowrap;
+}
+.field:after {                         
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.label {                         
+    float: left;
+    font-size: 11px;
+    text-shadow: 1px 1px 0 #000;
+    color: #bcbcbc;
+    position: relative;
+    text-align: right;
+
+    width: 60px;
+    line-height: 12px;
+    padding: 4px 6px 0 0;
+}
+
+.text-input {                         
+    float: left;
+    display: block;
+    position: relative;
+    background: #232323;
+    border: 1px solid black;
+    color: #ddd;
+    height: 21px;
+    width: 60px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1),0px 0 0 1px rgba(255,255,255,0.1);
+}

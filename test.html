@@ -4,11 +4,26 @@
 <title>Atlas Editor</title>
 <!-- <link rel="stylesheet" href="/bin/css/normalize.css">  -->
 <!-- <link rel="stylesheet" href="/bin/css/foundation.css"> -->
+<link rel="stylesheet" href="/bin/fontawesome/css/font-awesome.css">
 <link rel="stylesheet" href="/bin/css/main.css">
+
+<script type="text/javascript" src="/bin/js/jquery/dist/jquery.js"></script>
 
 </head>
 
 <body>
+
+    <script>
+    $(function(){
+        $(".text-input")
+        .focusin(function(){
+            $(".text-input").addClass("focused");
+        })
+        .focusout(function(){
+            $(".text-input").removeClass("focused");
+        });
+    })
+    </script>
 
     <div id="workspace" class="workspace">
         <canvas id="atlas-canvas"></canvas>
@@ -35,7 +50,13 @@
                 <div class="field">
                     <div class="label"><span>Threshold:</span></div>
                     <div class="text-input">
-                        hello
+                        <input type="text" tabindex="1" placeholder="0">
+                        <span class="unit">px</span>
+                        <div class="unit-buttons">
+                            <button class="button"><i class="fa fa-caret-up"></i></button>
+                            <span class="sep"></span>
+                            <a href="#" class="button"><i class="fa fa-caret-down"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -12,6 +12,7 @@
 var app = angular.module('app-atlas-editor', []);
 
 angular.element(document).ready(function() {
+
     console.log('starting atlas-editor');
 
     // document events

@@ -89,8 +89,14 @@ module.exports = (grunt) ->
             js:
                 expand: true 
                 cwd: 'ext/' 
-                src: ['foundation/js/**/*.js', 'angular/**/*.js'] 
+                src: ['foundation/js/**/*.js', 'angular/**/*.js', 'jquery/dist/*.js'] 
                 dest: 'bin/js/'
+                filter: 'isFile'
+            fontawesome:
+                expand: true 
+                cwd: 'ext/fontawesome/' 
+                src: ['css/**/*.css', 'fonts/**/*'] 
+                dest: 'bin/fontawesome/'
                 filter: 'isFile'
             img:
                 expand: true 

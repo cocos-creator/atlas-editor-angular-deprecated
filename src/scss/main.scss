@@ -1,3 +1,30 @@
+// basic ---------------------------------
+
+@mixin user-select($value) {
+    user-select: $value;        
+    -webkit-user-select: $value;
+    -moz-user-select: $value;   
+    -ms-user-select: $value;    
+}
+@mixin transition($value) {
+    transition: $value;
+    -webkit-transition: $value;
+}
+
+* {
+    font-family: Arial;
+    box-sizing: border-box;
+
+    /* pointer-events: none; */
+    cursor: default;     
+    @include user-select(none);
+}
+*:focus {                         
+    outline: 0;
+}
+
+// ---------------------------------
+
 $right-sidebar-width: 240px;
 $left-sidebar-width: 48px;
 
@@ -9,18 +36,6 @@ body {
     background: transparent;
 }
 
-* {
-    font-family: Arial;
-    box-sizing: border-box;
-
-    /* pointer-events: none; */
-    cursor: default;     
-    user-select: none;        
-    -webkit-user-select: none;
-    -moz-user-select: none;   
-    -ms-user-select: none;    
-}
-
 #atlas-canvas {
     background: url(/bin/img/checkerboard.png);
     display: block;
@@ -29,7 +44,7 @@ body {
     box-shadow: 5px 5px 5px 0 rgba(0,0,0,0.2);
     border: 2px solid #000;
     box-sizing: content-box;
-    transition: border-color 0.5s;
+    @include transition(border-color 0.5s);
 }
 
 .atlas-item {
@@ -93,18 +108,17 @@ body {
 }
 
 .field {                         
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;     
+    align-items: center;
+
     position: relative;
     padding: 4px 0;
     white-space: nowrap;
 }
-.field:after {                         
-    content: "";
-    display: block;
-    clear: both;
-}
 
 .label {                         
-    float: left;
     font-size: 11px;
     text-shadow: 1px 1px 0 #000;
     color: #bcbcbc;
@@ -112,89 +126,143 @@ body {
     text-align: right;
 
     width: 60px;
-    line-height: 12px;
-    padding: 4px 6px 0 0;
+    padding: 0px 6px 0 0;
 }
 
-.text-input {                         
-    float: left;
-    /* display: block;          */
+// unit-input ------------------------------------------
+
+.unit-input {                         
     display: flex;         
     flex-direction: row;
     flex-wrap: nowrap;     
+    align-items: baseline;
     position: relative;
-    background: #232323;
-    border: 1px solid black;
-    color: #ddd;
+
     height: 21px;
-    width: 100px;
+    min-height: 21px;
+    min-width: 60px;
+    border: 1px solid black;
 
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1),0px 0 0 1px rgba(255,255,255,0.1);
-    transition: box-shadow .5s ease;
-    -webkit-transition: box-shadow .5s ease;
-}
-.text-input.focused {                         
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1),0px 0 0 1px #0c70a6,0px 0 4px 1px rgba(12,112,166,0.8);
-}
-.text-input>input {                         
-    flex: auto;
-    /* width: 75%; */
-    padding: 3px 4px;
-    display: block;
-    font-size: 12px;
-    text-shadow: 1px 1px 0 #000;
-    border: 0;
-    margin: 0;
-    background: transparent;
+    background: #232323;
     color: #ddd;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1), 0px 0 0 1px rgba(255,255,255,0.1);
 
-    pointer-events: auto;
-    cursor: auto;
-}
-.text-input>input:focus {                         
-    outline: 0;
-}
-/* Note: A webkit bug that input::selection didn't works   */
-/* .text-input>input::selection {                          */
-/*     background: #f00;                                   */
-/* }                                                       */
-/* .text-input>input::-webkit-input-placeholder {                          */
-/*     font-style: italic;                                                 */
-/* }                                                                       */
-.text-input>.unit {                         
-    flex: 0 0 auto;
-    padding: 2px 3px 1px;
-    margin: 4px 1px 0 0;
-    text-align: center;
-    font-size: 9px;
-    text-transform: uppercase;
-    opacity: .7;
+    @include transition(box-shadow .3s ease);
 
-    cursor: pointer;
+    &.focused {                         
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1), 0px 0 0 1px #0c70a6, 0px 0 4px 1px rgba(12,112,166,0.8);
+    }
+
+    .input {                         
+        flex: auto;
+        display: block;
+        padding: 3px 4px;
+        border: 0;
+        margin: 0;
+        font-size: 12px;
+        height: 100%;
+
+        text-shadow: 1px 1px 0 #000;
+        background: transparent;
+        color: #ddd;
+
+        pointer-events: auto;
+        cursor: auto;
+
+        /* // Note: A webkit bug that input::selection didn't works                    */
+        /* &::selection {                                                              */
+        /*     background: #f00;                                                       */
+        /* }                                                                           */
+        /* &::-webkit-input-placeholder {                                              */
+        /*     font-style: italic;                                                     */
+        /* }                                                                           */
+    }
+
+    .unit {                         
+        flex: 0 0 auto;
+        margin-right: 4px;
+        text-align: center;
+        font-size: 9px;
+
+        text-transform: uppercase;
+        opacity: .7;
+    }
+
+    .unit-buttons {                         
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-self: center;
+        height: 100%;
+        border-left: 1px solid black;
+
+        .button {                         
+            flex: auto;
+            display: block;
+            border: 0;
+            margin: 0;
+            padding: 0;
+            width: 9px;
+            /* height: 9px; */
+
+            background-color: #474747;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #616161;
+                i {
+                    opacity: 1.0;
+                }
+            }
+
+            &:active {
+                background-color: #373737;
+                i {
+                    opacity: 0.3;
+                }
+            }
+
+            i {                         
+                font-size: 9px;
+
+                color: white;
+                opacity: .5;
+                cursor: inherit;
+            }
+        }
+
+        .sep {                         
+            flex: 0 0 1px;
+            display: block;
+
+            background-color: black;
+        }
+    }
 }
-.text-input>.unit-buttons {                         
-    flex: 0 0 auto;
-    height: 19px;
-    border-left: 1px solid black;
-}
-.text-input>.unit-buttons>.button {                         
-    display: block;
-    border: 0;
-    margin: 0;
-    width: 9px;
-    height: 9px;
-    background-color: #474747;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset;
-    cursor: auto;
-    padding-left: 2px;
-}
-.text-input>.unit-buttons>.button>i {                         
-    font-size: 9px;
-    color: white;
-    opacity: .5;
-}
-.text-input>.unit-buttons>.sep {                         
-    display: block;
-    height: 1px;
-    background-color: black;
+
+// checkbox ------------------------------------------
+
+.checkbox {                         
+    width: 13px;
+    height: 13px;
+    border: 1px solid #888;
+
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+    background: #232323;
+
+    cursor: pointer; 
+
+    @include transition(border-color .3s ease);
+
+    &:hover {
+        border-color: #bbb;
+    }
+
+    i {                         
+        font-size: 11px;
+
+        color: #0c90e6;
+        cursor: inherit;
+    }
 }

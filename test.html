@@ -15,13 +15,27 @@
 
     <script>
     $(function(){
-        $(".text-input")
+        $(".unit-input")
         .focusin(function(){
-            $(".text-input").addClass("focused");
-        })
+            $(this).addClass("focused");
+            })
         .focusout(function(){
-            $(".text-input").removeClass("focused");
-        });
+            $(this).removeClass("focused");
+            });
+
+        $(".checkbox")
+        .click(function(){
+               // var i = document.createElement( "i" );
+               // i.className = "fa fa-check";
+               if ( $(this).hasClass("checked") ) {
+                   $(this).find("i").remove();
+                   $(this).removeClass("checked");
+               }
+               else {
+                   $(this).append( $( "<i>", { class: "fa fa-check"} ) );
+                   $(this).addClass("checked");
+               }
+            });
     })
     </script>
 
@@ -41,6 +55,12 @@
             <div class="body">
                 <div class="field">
                     <div class="label"><span>Width:</span></div>
+                    <div class="drop-down">
+                        <select id="" name="">
+                            <option value="">512</option>
+                            <option value="">1024</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="field">
@@ -49,14 +69,21 @@
 
                 <div class="field">
                     <div class="label"><span>Threshold:</span></div>
-                    <div class="text-input">
-                        <input type="text" tabindex="1" placeholder="0">
+                    <div class="unit-input">
+                        <input class="input" type="text" tabindex="1" placeholder="0">
                         <span class="unit">px</span>
                         <div class="unit-buttons">
                             <button class="button"><i class="fa fa-caret-up"></i></button>
                             <span class="sep"></span>
-                            <a href="#" class="button"><i class="fa fa-caret-down"></i></a>
+                            <button class="button"><i class="fa fa-caret-down"></i></button>
                         </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label"><span>Rotate:</span></div>
+                    <div class="checkbox">
+                        <!-- <i class="fa fa-check"></i> -->
                     </div>
                 </div>
             </div>

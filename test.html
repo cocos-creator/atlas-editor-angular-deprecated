@@ -55,16 +55,36 @@
             <div class="body">
                 <div class="field">
                     <div class="label"><span>Width:</span></div>
-                    <div class="drop-down">
-                        <select id="" name="">
-                            <option value="">512</option>
-                            <option value="">1024</option>
-                        </select>
+                    <div class="dropdown">
+                        <div class="border">
+                            <span>512</span>
+                            <i class="fa fa-caret-down"></i>
+                        </div>
+                        <!-- <div class="menu">  -->
+                        <!--     <div>64</div>   -->
+                        <!--     <div>128</div>  -->
+                        <!--     <div>256</div>  -->
+                        <!--     <div>512</div>  -->
+                        <!--     <div>1024</div> -->
+                        <!--     <div>2048</div> -->
+                        <!--     <div>4096</div> -->
+                        <!-- </div>              -->
                     </div>
                 </div>
 
                 <div class="field">
                     <div class="label"><span>Height:</span></div>
+                    <div class="dropdown">
+                        <div class="border">
+                            <span>512</span>
+                            <i class="fa fa-caret-down"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label"><span>Trim:</span></div>
+                    <div class="checkbox"></div>
                 </div>
 
                 <div class="field">
@@ -81,10 +101,51 @@
                 </div>
 
                 <div class="field">
-                    <div class="label"><span>Rotate:</span></div>
-                    <div class="checkbox">
-                        <!-- <i class="fa fa-check"></i> -->
+                    <div class="label"><span>Algorithm:</span></div>
+                    <div class="dropdown">
+                        <div class="border">
+                            <span>MaxRect</span>
+                            <i class="fa fa-caret-down"></i>
+                        </div>
                     </div>
+                </div>
+
+                <div class="field">
+                    <div class="label"><span>Sort By:</span></div>
+                    <div class="dropdown">
+                        <div class="border">
+                            <span>UseBest</span>
+                            <i class="fa fa-caret-down"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label"><span>Sort Order:</span></div>
+                    <div class="dropdown">
+                        <div class="border">
+                            <span>UseBest</span>
+                            <i class="fa fa-caret-down"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label"><span>Padding:</span></div>
+                    <div class="unit-input">
+                        <input class="input" type="text" tabindex="1" placeholder="0">
+                        <span class="unit">px</span>
+                        <div class="unit-buttons">
+                            <button class="button"><i class="fa fa-caret-up"></i></button>
+                            <span class="sep"></span>
+                            <button class="button"><i class="fa fa-caret-down"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label"><span>Rotate:</span></div>
+                    <div class="checkbox"></div>
                 </div>
             </div>
         </div>

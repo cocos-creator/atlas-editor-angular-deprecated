@@ -266,3 +266,67 @@ body {
         cursor: inherit;
     }
 }
+
+// dropdown ------------------------------------------
+
+.dropdown {
+    flex: auto;
+    border: 1px solid #212121;
+    font-size: 12px;
+    position: relative;
+
+    cursor: pointer; 
+
+    &:hover {
+        .border {
+            background-color: #545454;
+            border-color: rgba(255,255,255,0.13);
+            border-top-color: rgba(255, 255, 255, 0.28);
+
+            i {                         
+                opacity: 1.0;
+            }
+        }
+    }
+
+    .border {
+        display: flex;         
+        flex-direction: row;
+        flex-wrap: nowrap;     
+        align-items: baseline;
+        flex: auto;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 3px 4px;
+
+        color: #bdbdbd;
+        background-color: #474747;
+        border-top-color: rgba(255, 255, 255, 0.2);
+
+        cursor: inherit; 
+
+        @include transition(background-color .3s ease);
+
+        span {
+            flex: auto;
+            cursor: inherit; 
+        }
+
+        i {                         
+            opacity: 0.5;
+            cursor: inherit; 
+        }
+    }
+
+    .menu {
+        position: absolute;
+        z-index: 11;
+        top: 100%;
+        min-width: 100%;
+        border: 1px solid #222;
+        padding: 3px 4px;
+
+        color: #bdbdbd;
+        background-color: #474747;
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset
+    }
+}

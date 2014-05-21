@@ -1,14 +1,45 @@
 // basic ---------------------------------
 
 @mixin user-select($value) {
-    user-select: $value;        
-    -webkit-user-select: $value;
-    -moz-user-select: $value;   
     -ms-user-select: $value;    
+    -moz-user-select: $value;   
+    -webkit-user-select: $value;
+    user-select: $value;        
 }
 @mixin transition($value...) {
-    transition: $value;
     -webkit-transition: $value;
+    transition: $value;
+}
+
+@mixin display-flexbox() {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+@mixin flex($values) {
+  -webkit-box-flex: $values;
+  -moz-box-flex: $values;
+  -webkit-flex: $values;
+  -ms-flex: $values;
+  flex: $values;
+}
+
+@mixin flex-direction($values) {
+  -moz-flex-direction: $values;
+  -webkit-flex-direction: $values;
+  -ms-flex-direction: $values;
+  flex-direction: $values;
+}
+
+@mixin order($val) {
+  -webkit-box-ordinal-group: $val;  
+  -moz-box-ordinal-group: $val;     
+  -ms-flex-order: $val;     
+  -webkit-order: $val;  
+  order: $val;
 }
 
 * {
@@ -108,8 +139,8 @@ body {
 }
 
 .field {                         
-    display: flex;
-    flex-direction: row;
+    @include display-flexbox();
+    @include flex-direction(row);
     flex-wrap: nowrap;     
     align-items: center;
 
@@ -120,7 +151,7 @@ body {
 }
 
 .label {                         
-    flex: 1 0 60px;
+    @include flex(1 0 60px);
     font-size: 11px;
     text-shadow: 1px 1px 0 #000;
     color: #bcbcbc;
@@ -133,15 +164,15 @@ body {
 }
 
 div.space {
-    flex: 1 0 60px;
+    @include flex(1 0 60px);
 }
 
 // unit-input ------------------------------------------
 
 .unit-input {                         
-    flex: 1 0 60px;
-    display: flex;         
-    flex-direction: row;
+    @include display-flexbox();
+    @include flex(1 0 60px);
+    @include flex-direction(row);
     flex-wrap: nowrap;     
     align-items: baseline;
     position: relative;
@@ -162,7 +193,7 @@ div.space {
     }
 
     .input {                         
-        flex: auto;
+        @include flex(auto);
         display: block;
         padding: 3px 4px;
         border: 0;
@@ -175,6 +206,7 @@ div.space {
         color: #ddd;
 
         pointer-events: auto;
+        @include user-select(auto);
         cursor: auto;
 
         /* // Note: A webkit bug that input::selection didn't works                    */
@@ -187,7 +219,7 @@ div.space {
     }
 
     .unit {                         
-        flex: 0 0 auto;
+        @include flex(0 0 auto);
         margin-right: 4px;
         text-align: center;
         font-size: 9px;
@@ -197,15 +229,15 @@ div.space {
     }
 
     .unit-buttons {                         
-        flex: 0 0 auto;
-        display: flex;
-        flex-direction: column;
+        @include display-flexbox();
+        @include flex(0 0 auto);
+        @include flex-direction(column);
         align-self: center;
         height: 100%;
         border-left: 1px solid black;
 
         .button {                         
-            flex: auto;
+            @include flex(auto);
             display: block;
             border: 0;
             margin: 0;
@@ -241,7 +273,7 @@ div.space {
         }
 
         .sep {                         
-            flex: 0 0 1px;
+            @include flex(0 0 1px);
             display: block;
 
             background-color: black;
@@ -278,7 +310,7 @@ div.space {
 // dropdown ------------------------------------------
 
 .dropdown {
-    flex: 1 0 60px;
+    @include flex(1 0 60px);
     box-shadow: 0 0 0 1px #212121;
     font-size: 12px;
     position: relative;
@@ -298,11 +330,11 @@ div.space {
     }
 
     .border {
-        display: flex;         
-        flex-direction: row;
+        @include display-flexbox();
+        @include flex-direction(row);
         flex-wrap: nowrap;     
         align-items: baseline;
-        flex: auto;
+        @include flex(auto);
         border: 1px solid rgba(255, 255, 255, 0.08);
         padding: 3px 4px;
 
@@ -315,7 +347,7 @@ div.space {
         @include transition(background-color .3s ease);
 
         span {
-            flex: auto;
+            @include flex(auto);
             cursor: inherit; 
         }
 

@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<title>Atlas Editor</title>
+<title>Test GUI</title>
 <!-- <link rel="stylesheet" href="/bin/css/normalize.css">  -->
 <!-- <link rel="stylesheet" href="/bin/css/foundation.css"> -->
 <link rel="stylesheet" href="/bin/fontawesome/css/font-awesome.css">
@@ -18,10 +18,10 @@
         $(".unit-input")
         .focusin(function(){
             $(this).addClass("focused");
-            })
+        })
         .focusout(function(){
             $(this).removeClass("focused");
-            });
+        });
 
         $(".checkbox")
         .click(function(){
@@ -35,7 +35,31 @@
                    $(this).append( $( "<i>", { class: "fa fa-check"} ) );
                    $(this).addClass("checked");
                }
-            });
+        });
+
+        $(".dropdown")
+        .click(function(){
+               var menu = $(this).find(".menu");
+               if ( menu.length !== 0 ) {
+                   if ( menu.hasClass("hide") ) {
+                       menu.removeClass("hide")
+                   }
+                   else {
+                       menu.addClass("hide")
+                   }
+               }
+               else {
+                   console.log(".dropdown>.menu not found");
+               }
+        })
+        .focusout(function(){
+               var menu = $(this).find(".menu");
+               if ( menu.length !== 0 ) {
+                   if ( menu.hasClass("hide") === false ) {
+                       menu.addClass("hide")
+                   }
+               }
+        });
     })
     </script>
 
@@ -54,43 +78,54 @@
         <div class="section">
             <div class="body">
                 <div class="field">
-                    <div class="label"><span>Width:</span></div>
+                    <div class="label"><span>Width</span></div>
                     <div class="dropdown">
                         <div class="border">
                             <span>512</span>
                             <i class="fa fa-caret-down"></i>
                         </div>
-                        <!-- <div class="menu">  -->
-                        <!--     <div>64</div>   -->
-                        <!--     <div>128</div>  -->
-                        <!--     <div>256</div>  -->
-                        <!--     <div>512</div>  -->
-                        <!--     <div>1024</div> -->
-                        <!--     <div>2048</div> -->
-                        <!--     <div>4096</div> -->
-                        <!-- </div>              -->
+                        <div class="menu hide"> 
+                            <div>64</div>  
+                            <div>128</div> 
+                            <div>256</div> 
+                            <div>512</div> 
+                            <div>1024</div>
+                            <div>2048</div>
+                            <div>4096</div>
+                        </div>             
                     </div>
                 </div>
 
                 <div class="field">
-                    <div class="label"><span>Height:</span></div>
+                    <div class="label"><span>Height</span></div>
                     <div class="dropdown">
                         <div class="border">
                             <span>512</span>
                             <i class="fa fa-caret-down"></i>
                         </div>
+                        <div class="menu hide"> 
+                            <div>64</div>  
+                            <div>128</div> 
+                            <div>256</div> 
+                            <div>512</div> 
+                            <div>1024</div>
+                            <div>2048</div>
+                            <div>4096</div>
+                        </div>             
                     </div>
                 </div>
 
                 <div class="field">
-                    <div class="label"><span>Trim:</span></div>
-                    <div class="checkbox"></div>
+                    <div class="label"><span>Trim</span></div>
+                    <div class="space">
+                        <div class="checkbox"></div>
+                    </div>
                 </div>
 
                 <div class="field">
-                    <div class="label"><span>Threshold:</span></div>
+                    <div class="label"><span>Trim Threshold</span></div>
                     <div class="unit-input">
-                        <input class="input" type="text" tabindex="1" placeholder="0">
+                        <input class="input" type="text" tabindex="1" placeholder="-">
                         <span class="unit">px</span>
                         <div class="unit-buttons">
                             <button class="button"><i class="fa fa-caret-up"></i></button>
@@ -101,39 +136,56 @@
                 </div>
 
                 <div class="field">
-                    <div class="label"><span>Algorithm:</span></div>
-                    <div class="dropdown">
+                    <div class="label"><span>Algorithm</span></div>
+                    <div class="dropdown" >
                         <div class="border">
                             <span>MaxRect</span>
                             <i class="fa fa-caret-down"></i>
                         </div>
+                        <div class="menu hide"> 
+                            <div>Basic</div>  
+                            <div>Tree</div> 
+                            <div>MaxRect</div> 
+                        </div>             
                     </div>
                 </div>
 
                 <div class="field">
-                    <div class="label"><span>Sort By:</span></div>
+                    <div class="label"><span>Sort By</span></div>
                     <div class="dropdown">
                         <div class="border">
                             <span>UseBest</span>
                             <i class="fa fa-caret-down"></i>
                         </div>
+                        <div class="menu hide"> 
+                            <div>UseBest</div>  
+                            <div>Width</div> 
+                            <div>Height</div> 
+                            <div>Area</div> 
+                            <div>Name</div> 
+                        </div>             
                     </div>
                 </div>
 
                 <div class="field">
-                    <div class="label"><span>Sort Order:</span></div>
+                    <div class="label"><span>Sort Order</span></div>
                     <div class="dropdown">
                         <div class="border">
                             <span>UseBest</span>
                             <i class="fa fa-caret-down"></i>
                         </div>
+                        <div class="menu hide"> 
+                            <div>UseBest</div>  
+                            <div>Ascending</div> 
+                            <div>Descending</div> 
+                        </div>             
                     </div>
                 </div>
 
                 <div class="field">
-                    <div class="label"><span>Padding:</span></div>
+                    <div class="label"><span>Custom Padding</span></div>
                     <div class="unit-input">
-                        <input class="input" type="text" tabindex="1" placeholder="0">
+                        <input class="input" type="text" tabindex="1" placeholder="-">
                         <span class="unit">px</span>
                         <div class="unit-buttons">
                             <button class="button"><i class="fa fa-caret-up"></i></button>
@@ -144,8 +196,10 @@
                 </div>
 
                 <div class="field">
-                    <div class="label"><span>Rotate:</span></div>
-                    <div class="checkbox"></div>
+                    <div class="label"><span>Allow Rotate</span></div>
+                    <div class="space">
+                        <div class="checkbox"></div>
+                    </div>
                 </div>
             </div>
         </div>

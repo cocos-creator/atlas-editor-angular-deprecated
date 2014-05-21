@@ -55,18 +55,14 @@ module.exports = (grunt) ->
         sass:
             build:
                 options:
-                    includePaths: ['src/scss', 'ext/foundation/scss/']
+                    includePaths: ['src/scss']
                 files:
-                    'bin/css/foundation.css': 'ext/foundation/scss/foundation.scss'
-                    'bin/css/normalize.css': 'ext/foundation/scss/normalize.scss'
                     'bin/css/main.css': 'src/scss/main.scss'
             build_min:
                 options:
-                    includePaths: ['src/scss', 'ext/foundation/scss/']
+                    includePaths: ['src/scss']
                     outputStyle: 'compressed'
                 files:
-                    'bin/css/foundation.min.css': 'ext/foundation/scss/foundation.scss'
-                    'bin/css/normalize.min.css': 'ext/foundation/scss/normalize.scss'
                     'bin/css/main.min.css': 'src/scss/main.scss'
 
         # cssmin
@@ -89,7 +85,7 @@ module.exports = (grunt) ->
             js:
                 expand: true 
                 cwd: 'ext/' 
-                src: ['foundation/js/**/*.js', 'angular/**/*.js', 'jquery/dist/*.js'] 
+                src: ['angular/**/*.js', 'jquery/dist/*.js'] 
                 dest: 'bin/js/'
                 filter: 'isFile'
             fontawesome:

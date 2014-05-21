@@ -1,0 +1,55 @@
+<html>
+
+<head>
+<title>Atlas Editor</title>
+<link rel="stylesheet" href="/bin/css/normalize.css">
+<link rel="stylesheet" href="/bin/css/main.css">
+
+<script type="text/javascript" src="/bin/js/angular/angular.js"></script>
+<script type="text/javascript" src="/bin/js/fireball-core/core.dev.js"></script>
+<script type="text/javascript" src="/bin/js/atlas-editor.dev.js"></script>
+</head>
+
+<body>
+
+    <div id="workspace" class="workspace">
+        <canvas id="atlas-canvas"></canvas>
+    </div>
+
+    <div id="left-sidebar" class="panel left sidebar">
+    </div>
+
+    <div ng-controller="AtlasCtrl" id="right-sidebar" class="panel right sidebar">
+        <div class="tabs">
+        </div>
+
+        <div class="section">
+            <div class="body">
+                <div class="field">
+                    <div class="label"><span>Width</span></div>
+                    <div class="dropdown" tabindex="1">
+                        <div class="border">
+                            <span>512</span>
+                            <i class="fa fa-caret-down"></i>
+                        </div>
+                        <div class="menu hide"> 
+                            <div>64</div>  
+                            <div>128</div> 
+                            <div>256</div> 
+                            <div>512</div> 
+                            <div>1024</div>
+                            <div>2048</div>
+                            <div>4096</div>
+                        </div>             
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <button ng-click="export()">Export Atlas</button>                                              
+    </div>
+
+</body>
+
+</html>

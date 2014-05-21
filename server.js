@@ -26,6 +26,9 @@ function error(status, msg) {
 app.get('/test', function(req, res){
     res.sendfile('test.html');
 });
+app.get('/test2', function(req, res){
+    res.sendfile('test2.html');
+});
 
 // serves all the static files
 app.get(/^(.+)$/, function(req, res){ 

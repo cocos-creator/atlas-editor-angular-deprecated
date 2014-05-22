@@ -89,7 +89,7 @@ module.exports = (grunt) ->
             js:
                 expand: true 
                 cwd: 'ext/' 
-                src: ['foundation/js/**/*.js', 'angular/**/*.js', 'jquery/dist/*.js'] 
+                src: ['foundation/js/**/*.js', 'angular/**/*.js', 'jquery/dist/*.js', 'paper/dist/paper-core*.js'] 
                 dest: 'bin/js/'
                 filter: 'isFile'
             fontawesome:

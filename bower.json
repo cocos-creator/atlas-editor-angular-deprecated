@@ -19,6 +19,7 @@
         "angular": "~1.3.0",
         "foundation": "",
         "jquery": "",
-        "fontawesome": ""
+        "fontawesome": "",
+        "paper": "",
     }
 }

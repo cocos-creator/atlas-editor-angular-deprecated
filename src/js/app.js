@@ -21,12 +21,11 @@ angular.element(document).ready(function() {
 
     // atlasCanvasEL events
     var atlasCanvasEL = document.getElementById('atlas-canvas');
-    atlasCanvasEL.width = 512;
-    atlasCanvasEL.height = 512;
-    var ctx = atlasCanvasEL.getContext("2d");
+    paper.setup(atlasCanvasEL);
+    paper.view.viewSize = [512, 512];
 
     //
-    var atlasEditor = new AtlasEditor(ctx);
+    var atlasEditor = new AtlasEditor(paper.project);
     atlasCanvasEL.ondragenter = function(e) {
         this.style.borderColor = 'blue';
     };

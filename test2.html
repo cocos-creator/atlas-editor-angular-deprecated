@@ -2,12 +2,14 @@
 
 <head>
 <title>Atlas Editor</title>
-<link rel="stylesheet" href="/bin/css/normalize.css">
+<link rel="stylesheet" href="/ext/fontawesome/css/font-awesome.css">
 <link rel="stylesheet" href="/bin/css/main.css">
 
-<script type="text/javascript" src="/bin/js/angular/angular.js"></script>
+<link rel="import" href="ext/polymer-polymer/polymer.html">
+<link rel="import" href="test-element.html">
+
+<script src="ext/platform/platform.js"></script>
 <script type="text/javascript" src="/bin/js/fireball-core/core.dev.js"></script>
-<script type="text/javascript" src="/bin/js/atlas-editor.dev.js"></script>
 </head>
 
 <body>
@@ -19,7 +21,8 @@
     <div id="left-sidebar" class="panel left sidebar">
     </div>
 
-    <div ng-controller="AtlasCtrl" id="right-sidebar" class="panel right sidebar">
+    <div id="right-sidebar" class="panel right sidebar">
+
         <div class="tabs">
         </div>
 
@@ -44,10 +47,12 @@
                     </div>
                 </div>
 
+                <my-element></my-element>
+
             </div>
         </div>
 
-        <button ng-click="export()">Export Atlas</button>                                              
+        <!-- <button ng-click="export()">Export Atlas</button>                                               -->
     </div>
 
 </body>

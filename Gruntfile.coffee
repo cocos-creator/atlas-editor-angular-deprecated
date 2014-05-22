@@ -82,24 +82,24 @@ module.exports = (grunt) ->
                 src: ['**/*.js'] 
                 dest: 'bin/js/fireball-core/'
                 filter: 'isFile'
-            js:
-                expand: true 
-                cwd: 'ext/' 
-                src: ['angular/**/*.js', 'jquery/dist/*.js'] 
-                dest: 'bin/js/'
-                filter: 'isFile'
-            fontawesome:
-                expand: true 
-                cwd: 'ext/fontawesome/' 
-                src: ['css/**/*.css', 'fonts/**/*'] 
-                dest: 'bin/fontawesome/'
-                filter: 'isFile'
             img:
                 expand: true 
                 cwd: 'src/img/' 
                 src: ['**/*'] 
                 dest: 'bin/img/'
                 filter: 'isFile'
+            # js:
+            #     expand: true 
+            #     cwd: 'ext/' 
+            #     src: ['angular/**/*.js', 'jquery/dist/*.js'] 
+            #     dest: 'bin/js/'
+            #     filter: 'isFile'
+            # fontawesome:
+            #     expand: true 
+            #     cwd: 'ext/fontawesome/' 
+            #     src: ['css/**/*.css', 'fonts/**/*'] 
+            #     dest: 'bin/fontawesome/'
+            #     filter: 'isFile'
 
     # Default task(s).
     grunt.registerTask 'default', ['min']

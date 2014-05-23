@@ -110,4 +110,5 @@ module.exports = (grunt) ->
 
     grunt.registerTask 'min', ['jshint', 'concat', 'uglify', 'copy', 'sass', 'cssmin']
     grunt.registerTask 'dev', ['jshint', 'concat', 'copy', 'sass']
+    grunt.registerTask 'all', ['min']
 

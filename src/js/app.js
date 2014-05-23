@@ -25,7 +25,7 @@ angular.element(document).ready(function() {
     paper.view.viewSize = [512, 512];
 
     //
-    var atlasEditor = new AtlasEditor(paper.project);
+    var atlasEditor = new AtlasEditor(atlasCanvasEL);
     atlasCanvasEL.ondragenter = function(e) {
         this.style.borderColor = 'blue';
     };

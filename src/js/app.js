@@ -21,22 +21,27 @@ angular.element(document).ready(function() {
 
     // atlasCanvasEL events
     var atlasCanvasEL = document.getElementById('atlas-canvas');
-    paper.setup(atlasCanvasEL);
-    paper.view.viewSize = [512, 512];
-
+    atlasCanvasEL.width = atlasCanvasEL.parentNode.clientWidth;
+    atlasCanvasEL.height = atlasCanvasEL.parentNode.clientHeight;
     //
     var atlasEditor = new AtlasEditor(atlasCanvasEL);
+    window.addEventListener('resize', function() {
+        atlasCanvasEL.width = atlasCanvasEL.parentNode.clientWidth;
+        atlasCanvasEL.height = atlasCanvasEL.parentNode.clientHeight;
+        atlasEditor.updateWindowSize();
+    }, false);
+
     atlasCanvasEL.ondragenter = function(e) {
-        this.style.borderColor = 'blue';
+        atlasEditor.droppingFile(true);
     };
     atlasCanvasEL.ondragover = function(e) {
         e.dataTransfer.dropEffect = 'copy';
     };
     atlasCanvasEL.ondragleave = function(e) {
-        this.style.borderColor = 'black';
+        atlasEditor.droppingFile(false);
     };
     atlasCanvasEL.ondrop = function(e) {
-        this.style.borderColor = 'black';
+        atlasEditor.droppingFile(false);
 
         var files = e.dataTransfer.files;
         atlasEditor.import(files);

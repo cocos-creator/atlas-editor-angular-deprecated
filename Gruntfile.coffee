@@ -55,10 +55,8 @@ module.exports = (grunt) ->
         sass:
             build:
                 options:
-                    includePaths: ['src/scss', 'ext/foundation/scss/']
+                    includePaths: ['src/scss']
                 files:
-                    'bin/css/foundation.css': 'ext/foundation/scss/foundation.scss'
-                    'bin/css/normalize.css': 'ext/foundation/scss/normalize.scss'
                     'bin/css/main.css': 'src/scss/main.scss'
             build_min:
                 options:

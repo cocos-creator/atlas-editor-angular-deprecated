@@ -72,34 +72,69 @@ var AtlasEditor = (function () {
 
     var _bindEvents = function (self) {
         var tool = new paper.Tool();
+        //var rightBtnDown = false;
         tool.onMouseDown = function (event) {
-            if ((!event.item || event.item.layer !== self.atlasLayer) && !(event.modifiers.control || event.modifiers.command)) {
-                _clearSelection(self);
+            if (event.event.button === 0) {
+                if ((!event.item || event.item.layer !== self._atlasLayer) && !(event.modifiers.control || event.modifiers.command)) {
+                    _clearSelection(self);
+                }
+            }
+        };
+        tool.onMouseUp = function (event) {
+            if (event.event.button === 0) {
+                self._atlasDragged = false;
             }
         };
         tool.onMouseDrag = function (event) {
-            for (var i = 0; i < self.selection.length; i++) {
-                var atlas = self.selection[i];
-                var bounds = atlas.data.bounds;
-                var outline = atlas.data.outline;
-                var tex = atlas.data.texture;
-                // update canvas
-                atlas.position = atlas.position.add(event.delta);
-                if (bounds) {
-                    bounds.position = bounds.position.add(event.delta);
-                }
-                if (outline) {
-                    outline.position = outline.position.add(event.delta);
-                }
-                // update atlas
-                tex.x = atlas.position.x;
-                tex.y = atlas.position.y;
+            if (event.event.button === 2) {
+                // drag viewport
+                self._globalTransformLayer.position = self._globalTransformLayer.position.add(event.delta);
             }
-            self.mouseDragged = true;
+            else {
+                // drag atlas
+                for (var i = 0; i < self._selection.length; i++) {
+                    var atlas = self._selection[i];
+                    var bounds = atlas.data.bounds;
+                    var outline = atlas.data.outline;
+                    var tex = atlas.data.texture;
+                    // update canvas
+                    atlas.position = atlas.position.add(event.delta);
+                    if (bounds) {
+                        bounds.position = bounds.position.add(event.delta);
+                    }
+                    if (outline) {
+                        outline.position = outline.position.add(event.delta);
+                    }
+                    // update atlas
+                    tex.x = atlas.position.x;
+                    tex.y = atlas.position.y;
+                }
+                self._atlasDragged = true;
+            }
         };
-        tool.onMouseUp = function (event) {
-            self.mouseDragged = false;
-        };
+
+        // right button
+        // var fixWhich = function() {
+        //     if (!e.which && e.button) {
+        //         if (e.button & 1) e.which = 1;      // Left
+        //         else if (e.button & 4) e.which = 2; // Middle
+        //         else if (e.button & 2) e.which = 3; // Right
+        //     }
+        // };
+        // self._paperProject.view.element.onmouseup = function(e) {
+        //     console.log(e);
+        //     if (e.which == 3) {
+        //         rightBtnDown = false;
+        //     }
+        // };
+        // self._paperProject.view.element.onmousedown = function(e) {
+        //     console.log(e);
+        //     if (e.which == 3) {
+        //         rightBtnDown = true;
+        //     }
+        // };
+        // prevent default menu
+        self._paperProject.view.element.oncontextmenu = function() { return false; };
     };
 
     var _onload = function (e) {    // TODO split atlasEditor into two class, loader & editor
@@ -234,7 +269,7 @@ var AtlasEditor = (function () {
         var onDown, onUp;
         if (!forExport) {
             onDown = function (event) {
-                if (!(event.modifiers.control || event.modifiers.command)) {
+                if (event.event.button === 0 && !(event.modifiers.control || event.modifiers.command)) {
                     var index = self._selection.indexOf(this);
                     if (index == -1) {
                         _clearSelection(self);
@@ -243,7 +278,7 @@ var AtlasEditor = (function () {
                 }
             };
             onUp = function (event) {
-                if (self.mouseDragged) {
+                if (event.event.button !== 0 || self._atlasDragged) {
                     return;
                 }
                 if ((event.modifiers.control || event.modifiers.command)) {

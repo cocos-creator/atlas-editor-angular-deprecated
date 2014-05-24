@@ -9,17 +9,17 @@ var AtlasEditor = (function () {
     
     function AtlasEditor(canvas) {
         this.atlas = new FIRE.Atlas();
-        this.selection = [];
-        this.mouseDragged = false;
-        this.gridSize = 32;
-        this.border = null;
-        this.autoCentered = false;  // 打开网页后，自动居中一次，然后才显示出来
+        this._selection = [];
+        this._atlasDragged = false;
+        this._gridSize = 32;
+        this._border = null;
+        this._autoCentered = false;  // 打开网页后，自动居中一次，然后才显示出来
 
         // init paper
         var size = [canvas.width, canvas.height];
         paper.setup(canvas);
         paper.view.viewSize = size; // to prevent canvas resizing during paper.setup
-        this.paperProject = paper.project;
+        this._paperProject = paper.project;
         _initLayers(this);
         //
 
@@ -39,27 +39,27 @@ var AtlasEditor = (function () {
             return existedLayer;
         };
 
-        self.globalTransformLayer = initLayer(self.paperProject.activeLayer);   // to support viewport movement
-        self.bgLayer = initLayer();           // to draw checkerboard, border, shadow etc.
-        //self.atlasBgLayer = initLayer();      // to draw atlas rect
-        self.atlasLayer = initLayer();        // to draw atlas texture
-        self.atlasHandlerLayer = initLayer(); // to draw outline of selected atlas
+        self._globalTransformLayer = initLayer(self._paperProject.activeLayer);   // to support viewport movement
+        self._bgLayer = initLayer();           // to draw checkerboard, border, shadow etc.
+        //self._atlasBgLayer = initLayer();      // to draw atlas rect
+        self._atlasLayer = initLayer();        // to draw atlas texture
+        self._atlasHandlerLayer = initLayer(); // to draw outline of selected atlas
 
-        self.paperProject.layers.push(self.globalTransformLayer);
-        self.globalTransformLayer.addChildren([
+        self._paperProject.layers.push(self._globalTransformLayer);
+        self._globalTransformLayer.addChildren([
             // BOTTOM (sorted by create order) -----------
-            self.bgLayer,
-            //self.atlasBgLayer,
-            self.atlasLayer,
-            self.atlasHandlerLayer,
+            self._bgLayer,
+            //self._atlasBgLayer,
+            self._atlasLayer,
+            self._atlasHandlerLayer,
             // TOP ---------------------------------------
         ]);
     };
 
     var _centerViewport = function (self) {
-        var size = self.paperProject.view.viewSize;
+        var size = self._paperProject.view.viewSize;
         var x = Math.round((size.width - 512) * 0.5);
-        self.globalTransformLayer.position = [x, DEFAULT_TOP_MARGIN];
+        self._globalTransformLayer.position = [x, DEFAULT_TOP_MARGIN];
     };
 
     // private
@@ -170,22 +170,22 @@ var AtlasEditor = (function () {
     };
 
     var _clearSelection = function (self) {
-        for (var selected in self.selection) {
+        for (var selected in self._selection) {
             if (selected.outline) {
                 selected.outline = null;
             }
         }
-        self.selection.length = 0;
-        self.atlasHandlerLayer.removeChildren();
+        self._selection.length = 0;
+        self._atlasHandlerLayer.removeChildren();
     };
 
     var _selectAtlas = function (self, atlasRaster, event) {
-        self.selection.push(atlasRaster);
+        self._selection.push(atlasRaster);
         atlasRaster.data.bounds.bringToFront();
         atlasRaster.bringToFront();
 
-        self.paperProject.activate();
-        self.atlasHandlerLayer.activate();
+        self._paperProject.activate();
+        self._atlasHandlerLayer.activate();
         var strokeWidth = 2;
         var bounds = atlasRaster.bounds.expand(strokeWidth);
         var outline = new paper.Shape.Rectangle(bounds);
@@ -198,15 +198,15 @@ var AtlasEditor = (function () {
 
     // need its paper project activated
     var _drawBackground = function (self) {
-        self.bgLayer.activate();
-        self.bgLayer.removeChildren();
+        self._bgLayer.activate();
+        self._bgLayer.removeChildren();
         var borderWidth = 2;
         // draw rect
         var borderRect = new paper.Rectangle(0, 0, 512, 512);
         borderRect = borderRect.expand(borderWidth);
-        self.border = new paper.Shape.Rectangle(borderRect);
-        self.border.fillColor = GRID_COLOR_1;
-        self.border.style = {
+        self._border = new paper.Shape.Rectangle(borderRect);
+        self._border.fillColor = GRID_COLOR_1;
+        self._border.style = {
             strokeWidth: borderWidth,
             shadowColor: [0, 0, 0, 0.7],
             shadowBlur: 8,
@@ -214,15 +214,15 @@ var AtlasEditor = (function () {
         };
         self.droppingFile(false);
         // draw checkerboard
-        var rectTemplate1 = new paper.Shape.Rectangle(0, 0, self.gridSize, self.gridSize);
+        var rectTemplate1 = new paper.Shape.Rectangle(0, 0, self._gridSize, self._gridSize);
         rectTemplate1.remove();
         rectTemplate1.fillColor = GRID_COLOR_2;
-        var pivotOffset = -Math.round(self.gridSize/2);
+        var pivotOffset = -Math.round(self._gridSize/2);
         rectTemplate1.pivot = [pivotOffset, pivotOffset];
         var symbol1 = new paper.Symbol(rectTemplate1);
-        for (var x = 0; x < 512; x += self.gridSize) {
-            for (var y = 0; y < 512; y += self.gridSize) {
-                if (x % (self.gridSize * 2) !== y % (self.gridSize * 2)) {
+        for (var x = 0; x < 512; x += self._gridSize) {
+            for (var y = 0; y < 512; y += self._gridSize) {
+                if (x % (self._gridSize * 2) !== y % (self._gridSize * 2)) {
                     symbol1.place([x, y]);
                 }
             }
@@ -235,7 +235,7 @@ var AtlasEditor = (function () {
         if (!forExport) {
             onDown = function (event) {
                 if (!(event.modifiers.control || event.modifiers.command)) {
-                    var index = self.selection.indexOf(this);
+                    var index = self._selection.indexOf(this);
                     if (index == -1) {
                         _clearSelection(self);
                         _selectAtlas(self, this, event);
@@ -247,9 +247,9 @@ var AtlasEditor = (function () {
                     return;
                 }
                 if ((event.modifiers.control || event.modifiers.command)) {
-                    var index = self.selection.indexOf(this);
+                    var index = self._selection.indexOf(this);
                     if (index != -1) {
-                        self.selection.splice(index, 1);
+                        self._selection.splice(index, 1);
                         this.data.outline.remove();
                         this.data.outline = null;
                         this.bringToFront();
@@ -263,11 +263,11 @@ var AtlasEditor = (function () {
                 }
             };
 
-            //self.atlasBgLayer.removeChildren();
-            self.atlasLayer.removeChildren();
-            self.atlasHandlerLayer.removeChildren();
+            //self._atlasBgLayer.removeChildren();
+            self._atlasLayer.removeChildren();
+            self._atlasHandlerLayer.removeChildren();
 
-            self.atlasLayer.activate();
+            self._atlasLayer.activate();
         }
         
         for (var i = 0; i < self.atlas.textures.length; ++i) {
@@ -279,14 +279,14 @@ var AtlasEditor = (function () {
                 atlasRaster.data.texture = tex;
                 // draw rectangle
 
-                //self.atlasBgLayer.activate();
+                //self._atlasBgLayer.activate();
 
                 var rect = new paper.Shape.Rectangle(tex.x, tex.y, tex.rotatedWidth(), tex.rotatedHeight());
                 rect.fillColor = ATLAS_BOUND_COLOR;
                 atlasRaster.data.bounds = rect;
                 atlasRaster.bringToFront();
 
-                //self.atlasLayer.activate();
+                //self._atlasLayer.activate();
 
                 // bind events
                 atlasRaster.onMouseDown = onDown;
@@ -298,8 +298,8 @@ var AtlasEditor = (function () {
 
     // repaint all canvas
     AtlasEditor.prototype.repaint = function () {
-        this.selection.length = 0;
-        this.paperProject.activate();
+        this._selection.length = 0;
+        this._paperProject.activate();
         _drawBackground(this);
         _drawAtlas( this, false );
     };
@@ -316,12 +316,12 @@ var AtlasEditor = (function () {
     //
     AtlasEditor.prototype.updateWindowSize = function () {
         // resize
-        var view = this.paperProject.view;
+        var view = this._paperProject.view;
         view.viewSize = [view.element.width, view.element.height];
 
-        if (this.autoCentered === false) {
+        if (this._autoCentered === false) {
             _centerViewport(this);
-            this.autoCentered = true;
+            this._autoCentered = true;
         }
         // repaint
         this.repaint();
@@ -329,8 +329,8 @@ var AtlasEditor = (function () {
 
     //
     AtlasEditor.prototype.droppingFile = function (dropping) {
-        this.border.strokeColor = dropping ? BORDER_COLOR_HIGHLIGHT : BORDER_COLOR;
-        this.paperProject.view.update();
+        this._border.strokeColor = dropping ? BORDER_COLOR_HIGHLIGHT : BORDER_COLOR;
+        this._paperProject.view.update();
     };
 
     return AtlasEditor;

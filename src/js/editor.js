@@ -41,8 +41,8 @@ var AtlasEditor = (function () {
 
         self._globalTransformLayer = initLayer(self._paperProject.activeLayer);   // to support viewport movement
         self._bgLayer = initLayer();           // to draw checkerboard, border, shadow etc.
-        //self._atlasBgLayer = initLayer();      // to draw atlas rect
-        self._atlasLayer = initLayer();        // to draw atlas texture
+        //self._atlasBgLayer = initLayer();
+        self._atlasLayer = initLayer();        // to draw atlas bounds & texture
         self._atlasHandlerLayer = initLayer(); // to draw outline of selected atlas
 
         self._paperProject.layers.push(self._globalTransformLayer);
@@ -74,19 +74,21 @@ var AtlasEditor = (function () {
         var tool = new paper.Tool();
         //var rightBtnDown = false;
         tool.onMouseDown = function (event) {
-            if (event.event.button === 0) {
+            if (event.event.which === 1) {
                 if ((!event.item || event.item.layer !== self._atlasLayer) && !(event.modifiers.control || event.modifiers.command)) {
                     _clearSelection(self);
                 }
             }
         };
         tool.onMouseUp = function (event) {
-            if (event.event.button === 0) {
+            if (event.event.which === 1) {
                 self._atlasDragged = false;
             }
         };
         tool.onMouseDrag = function (event) {
-            if (event.event.button === 2) {
+            var rightButtonDown = event.event.which === 3;
+            rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
+            if (rightButtonDown) {
                 // drag viewport
                 self._globalTransformLayer.position = self._globalTransformLayer.position.add(event.delta);
             }
@@ -269,7 +271,7 @@ var AtlasEditor = (function () {
         var onDown, onUp;
         if (!forExport) {
             onDown = function (event) {
-                if (event.event.button === 0 && !(event.modifiers.control || event.modifiers.command)) {
+                if (event.event.which === 1 && !(event.modifiers.control || event.modifiers.command)) {
                     var index = self._selection.indexOf(this);
                     if (index == -1) {
                         _clearSelection(self);
@@ -278,7 +280,7 @@ var AtlasEditor = (function () {
                 }
             };
             onUp = function (event) {
-                if (event.event.button !== 0 || self._atlasDragged) {
+                if (event.event.which !== 1 || self._atlasDragged) {
                     return;
                 }
                 if ((event.modifiers.control || event.modifiers.command)) {

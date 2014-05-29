@@ -349,8 +349,8 @@ var AtlasEditor = (function () {
                 // update rectangle
                 var left = posFilter(tex.x * self._zoom);
                 var top = posFilter(tex.y * self._zoom);
-                var w = posFilter(tex.rotatedWidth() * self._zoom);
-                var h = posFilter(tex.rotatedHeight() * self._zoom);
+                var w = posFilter(tex.rotatedWidth * self._zoom);
+                var h = posFilter(tex.rotatedHeight * self._zoom);
                 var bounds = child.data.boundsItem;
                 bounds.size = [w, h];
                 bounds.position = new paper.Rectangle(left, top, w, h).center;

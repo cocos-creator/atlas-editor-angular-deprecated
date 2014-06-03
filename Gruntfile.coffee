@@ -21,6 +21,7 @@ module.exports = (grunt) ->
             js:
                 src: [
                     'src/js/AtlasCtrl.js',
+                    'src/js/workSpace.js',
                     'src/js/editor.js',
                     'src/js/app.js',
                 ]

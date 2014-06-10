@@ -20,11 +20,11 @@ var AtlasEditor = (function () {
     FIRE.extend(_class, _super);
 
     var _initLayers = function (self) {
-        //self._atlasBgLayer = _super.initLayer();
-        self._atlasLayer = _super.initLayer();        // to draw atlas bounds & texture
-        self._atlasHandlerLayer = _super.initLayer(); // to draw outline of selected atlas
+        //self._atlasBgLayer = WorkSpace.createLayer();
+        self._atlasLayer = WorkSpace.createLayer();        // to draw atlas bounds & texture
+        self._atlasHandlerLayer = WorkSpace.createLayer(); // to draw outline of selected atlas
 
-        self._globalTransformLayer.addChildren([
+        self._cameraLayer.addChildren([
             // BOTTOM (sorted by create order) -----------
             //self._atlasBgLayer,
             self._atlasLayer,
@@ -139,25 +139,12 @@ var AtlasEditor = (function () {
             if ( _processing === 0 ) {
                 editor.atlas.sort();
                 editor.atlas.layout();
-                editor.repaint();
+                _recreateAtlas( editor, false );
                 return;
             }
             setTimeout( checkIfFinished, 500 );
         };
         checkIfFinished();
-    };
-
-    var _getAtalsRaster = function (tex) {
-        var tmpRawRaster = new paper.Raster(tex.image);
-        var trimRect = new paper.Rectangle(tex.trimX, tex.trimY, tex.width, tex.height);
-        var raster = tmpRawRaster.getSubRaster(trimRect);
-        tmpRawRaster.remove();  // can only be removed after getSubRaster
-        raster.pivot = [-tex.width * 0.5, -tex.height * 0.5];
-        if (tex.rotated) {
-            raster.pivot = [raster.pivot.x, -raster.pivot.y];
-            raster.rotation = 90;
-        }
-        return raster;
     };
 
     var _clearSelection = function (self) {
@@ -256,7 +243,7 @@ var AtlasEditor = (function () {
         }
         for (var i = 0; i < self.atlas.textures.length; ++i) {
             var tex = self.atlas.textures[i];
-            var atlasRaster = _getAtalsRaster(tex); 
+            var atlasRaster = WorkSpace.createAtlasRaster(tex); 
             atlasRaster.data.texture = tex;
 
             if (!forExport) {
@@ -279,7 +266,7 @@ var AtlasEditor = (function () {
 
     _class.prototype._updateCanvas = function () {
         _updateAtlas(this, false);
-        paper.view.draw();
+        _super.prototype._updateCanvas.call(this);
     };
 
     var _updateAtlas = function ( self ) {

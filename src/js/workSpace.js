@@ -1,7 +1,5 @@
 ﻿var WorkSpace = (function () {
 
-    var DEFAULT_TOP_MARGIN = 20;
-
     function WorkSpace (canvas) {
         this._zoom = 1;
         this._border = null;
@@ -24,21 +22,33 @@
 
     _class.BORDER_COLOR = new paper.Color(0.08, 0.08, 0.08, 1);
     
-    _class.initLayer = function (existedLayer) {
-        existedLayer = existedLayer || new paper.Layer();
-        existedLayer.remove();
+    _class.createLayer = function (existedLayer) {
+        existedLayer = existedLayer || new paper.Layer(paper.Item.NO_INSERT);
         existedLayer.applyMatrix = false;
         existedLayer.position = [0, 0];   // in paper, position should be settled before pivot
         existedLayer.pivot = [0, 0];
         return existedLayer;
     };
-    
+
+    _class.createAtlasRaster = function (tex) {
+        var tmpRawRaster = new paper.Raster(tex.image);
+        var trimRect = new paper.Rectangle(tex.trimX, tex.trimY, tex.width, tex.height);
+        var raster = tmpRawRaster.getSubRaster(trimRect);
+        tmpRawRaster.remove();  // can only be removed after getSubRaster
+        raster.pivot = [-tex.width * 0.5, -tex.height * 0.5];
+        if (tex.rotated) {
+            raster.pivot = [raster.pivot.x, -raster.pivot.y];
+            raster.rotation = 90;
+        }
+        return raster;
+    };
+
     _class.prototype.setZoom = function (zoom) {
         this._zoom = zoom;
 
         var center = this._border.bounds.center;    // current center
         var offset = 512 * this._zoom / 2;
-        this._globalTransformLayer.position = this._globalTransformLayer.position.add(center).subtract([offset, offset]).round();
+        this._cameraLayer.position = this._cameraLayer.position.add(center).subtract([offset, offset]).round();
 
         this._recreateBackground();
         this._updateCanvas();
@@ -49,15 +59,24 @@
         var view = this._paperProject.view;
         view.viewSize = [view.element.width, view.element.height];
 
+        //console.log(init + ' ' + view.viewSize);
+        //this._paperProject.activate();
         if (this._autoCentered === false) {
             _centerViewport(this);
             this._autoCentered = true;
+
+            //this.repaint();
         }
-        // repaint
+        //else {
+        //    this._updateCanvas();
+        //}
+
+        // 按理说只要第一次repaint，之后_updateCanvas就行，但这样会导致打开网页时常常看不到东西，不知道为什么
         this._paperProject.activate();
         this.repaint();
     };
 
+    // recreate all item
     _class.prototype.repaint = function () {
         this._recreateBackground();
     };
@@ -80,8 +99,8 @@
         this._border.style = {
             strokeWidth: borderWidth,
             strokeColor: WorkSpace.BORDER_COLOR,
-            shadowColor: [0, 0, 0, 0.7],
-            shadowBlur: 8,
+            shadowColor: [0, 0, 0, 0.5],
+            shadowBlur: 7,
             shadowOffset: new paper.Point(2, 2),
         };
     };
@@ -91,7 +110,7 @@
         rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
         if (rightButtonDown) {
             // drag viewport
-            this._globalTransformLayer.position = this._globalTransformLayer.position.add(event.delta);
+            this._cameraLayer.position = this._cameraLayer.position.add(event.delta);
             return false;
         }
     };
@@ -101,11 +120,11 @@
     _class.prototype._onMouseUp = function (target, event) {};
 
     var _initLayers = function (self) {
-        self._globalTransformLayer = WorkSpace.initLayer(self._paperProject.activeLayer);   // to support viewport movement
-        self._bgLayer = WorkSpace.initLayer();           // to draw checkerboard, border, shadow etc.
+        self._cameraLayer = WorkSpace.createLayer(self._paperProject.activeLayer);   // to support viewport movement
+        self._bgLayer = WorkSpace.createLayer();           // to draw checkerboard, border, shadow etc.
 
-        self._paperProject.layers.push(self._globalTransformLayer);
-        self._globalTransformLayer.addChildren([
+        self._paperProject.layers.push(self._cameraLayer);
+        self._cameraLayer.addChildren([
             // BOTTOM (sorted by create order) -----------
             self._bgLayer,
             // TOP ---------------------------------------
@@ -143,21 +162,22 @@
         //    rightButtonDown = rightButtonDown || (typeof(event.buttons) !== 'undefined' && (event.buttons & 2) > 0); // tweak for firefox and IE
         //    if (rightButtonDown) {
         //        // drag viewport
-        //        self._globalTransformLayer.position = self._globalTransformLayer.position.add(delta);
+        //        self._cameraLayer.position = self._cameraLayer.position.add(delta);
         //    }
         //});
         
         // zoom in / out
         canvas.bind('mousewheel DOMMouseScroll', function(e) {
+            var zoom = self._zoom;
             if(e.originalEvent.wheelDelta > 0 || e.originalEvent.detail < 0) {
-                self._zoom += 0.1;
-                self._zoom = Math.min(self._zoom, 8);
+                zoom += 0.1;
+                zoom = Math.min(zoom, 8);
             }
             else {
-                self._zoom -= 0.1;
-                self._zoom = Math.max(self._zoom, 0.1);
+                zoom -= 0.1;
+                zoom = Math.max(zoom, 0.1);
             }
-            self.setZoom(self._zoom);
+            self.setZoom(zoom);
         });
 
         // prevent default menu
@@ -167,7 +187,8 @@
     var _centerViewport = function (self) {
         var size = self._paperProject.view.viewSize;
         var x = Math.round((size.width - 512) * 0.5);
-        self._globalTransformLayer.position = [x, DEFAULT_TOP_MARGIN];
+        var y = Math.round((size.height - 512) * 0.5);
+        self._cameraLayer.position = [x, y];
     };
 
     return _class;

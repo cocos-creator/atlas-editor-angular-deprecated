@@ -44,11 +44,12 @@
     };
 
     _class.prototype.setZoom = function (zoom) {
-        this._zoom = zoom;
+        var center = paper.view.center;
+        var offset = this._cameraLayer.position.subtract(center);
+        var newOffset = offset.divide(this._zoom).multiply(zoom);
+        this._cameraLayer.position = center.add(newOffset).round();
 
-        var center = this._border.bounds.center;    // current center
-        var offset = 512 * this._zoom / 2;
-        this._cameraLayer.position = this._cameraLayer.position.add(center).subtract([offset, offset]).round();
+        this._zoom = zoom;
 
         this._recreateBackground();
         this._updateCanvas();

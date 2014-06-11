@@ -139,7 +139,7 @@ var AtlasEditor = (function () {
             if ( _processing === 0 ) {
                 editor.atlas.sort();
                 editor.atlas.layout();
-                _recreateAtlas( editor, false );
+                editor._recreateAtlas(false);
                 return;
             }
             setTimeout( checkIfFinished, 500 );
@@ -200,8 +200,8 @@ var AtlasEditor = (function () {
         }
     };
 
-    // need its paper project activated
-    var _recreateAtlas = function ( self, forExport ) {
+    _class.prototype._recreateAtlas = function (forExport) {
+        var self = this;
         var onDown, onUp;
         if (!forExport) {
             onDown = function (event) {
@@ -241,41 +241,27 @@ var AtlasEditor = (function () {
 
             self._atlasLayer.activate();
         }
-        for (var i = 0; i < self.atlas.textures.length; ++i) {
-            var tex = self.atlas.textures[i];
-            var atlasRaster = WorkSpace.createAtlasRaster(tex); 
-            atlasRaster.data.texture = tex;
+        WorkSpace.createAtlasRasters(self.atlas, !forExport, onDown, onUp);
 
-            if (!forExport) {
-                atlasRaster.data.boundsItem = new paper.Shape.Rectangle();
-                atlasRaster.bringToFront();
-
-                // bind events
-                atlasRaster.onMouseDown = onDown;
-                atlasRaster.onMouseUp = onUp;
-            }
-            else {
-                atlasRaster.position = [tex.x, tex.y];
-            }
-        }
         if (!forExport) {
             _updateAtlas (self, forExport);
         }
-        paper.view.draw();
+        paper.view.update();
     };
 
-    _class.prototype._updateCanvas = function () {
+    _class.prototype._doUpdateCanvas = function () {
+        _super.prototype._doUpdateCanvas.call(this);
         _updateAtlas(this, false);
-        _super.prototype._updateCanvas.call(this);
     };
 
     var _updateAtlas = function ( self ) {
         var posFilter = Math.round;
-        var sizeFilter = Math.round;
+        //var sizeFilter = Math.round;
         var children = self._atlasLayer.children;
         for (var i = 0; i < children.length; ++i) {
             var child = children[i];
-            if (!child.data || !child.data.texture) {
+            var isRaster = child.data && child.data.texture;
+            if (!isRaster) {
                 continue;
             }
             // update atlas
@@ -298,21 +284,12 @@ var AtlasEditor = (function () {
                 outline.size = bounds.size;
             }
         }
-        paper.view.draw();
+        //paper.view.draw();
     };
 
     _class.prototype.repaint = function () {
         _super.prototype.repaint.call(this);
-        _recreateAtlas( this, false );
-    };
-
-    //
-    _class.prototype.paintNewCanvas = function () {
-        var canvas = document.createElement("canvas");
-        paper.setup(canvas);
-        paper.view.viewSize = [512, 512];
-        _recreateAtlas( this, true );
-        return canvas;
+        this._recreateAtlas(false);
     };
 
     //

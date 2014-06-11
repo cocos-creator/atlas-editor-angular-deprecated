@@ -1,4 +1,8 @@
 ﻿var WorkSpace = (function () {
+    
+    // ================================================================================
+    /// constructor
+    // ================================================================================
 
     function WorkSpace (canvas) {
         this._zoom = 1;
@@ -20,8 +24,12 @@
     }
     var _class = WorkSpace;
 
+    // ================================================================================
+    /// static
+    // ================================================================================
+
     _class.BORDER_COLOR = new paper.Color(0.08, 0.08, 0.08, 1);
-    
+
     _class.createLayer = function (existedLayer) {
         existedLayer = existedLayer || new paper.Layer(paper.Item.NO_INSERT);
         existedLayer.applyMatrix = false;
@@ -30,7 +38,7 @@
         return existedLayer;
     };
 
-    _class.createAtlasRaster = function (tex) {
+    _class.createSpriteRaster = function (tex) {
         var tmpRawRaster = new paper.Raster(tex.image);
         var trimRect = new paper.Rectangle(tex.trimX, tex.trimY, tex.width, tex.height);
         var raster = tmpRawRaster.getSubRaster(trimRect);
@@ -43,6 +51,34 @@
         return raster;
     };
 
+    _class.createAtlasRasters = function (atlas, addBounds, onMouseDown, onMouseUp) {
+        console.time('create raster');
+        for (var i = 0; i < atlas.textures.length; ++i) {
+            var tex = atlas.textures[i];
+            var raster = WorkSpace.createSpriteRaster(tex);
+            raster.data.texture = tex;
+            if (addBounds) {
+                raster.data.boundsItem = new paper.Shape.Rectangle(paper.Item.NO_INSERT);
+                raster.data.boundsItem.insertBelow(raster);
+                // bind events
+                if (onMouseDown) {
+                    raster.onMouseDown = onMouseDown;
+                }
+                if (onMouseUp) {
+                    raster.onMouseUp = onMouseUp;
+                }
+            }
+            else {
+                raster.position = [tex.x, tex.y];
+            }
+        }
+        console.timeEnd('create raster');
+    };
+
+    // ================================================================================
+    /// public
+    // ================================================================================
+
     _class.prototype.setZoom = function (zoom) {
         var center = paper.view.center;
         var offset = this._cameraLayer.position.subtract(center);
@@ -52,9 +88,9 @@
         this._zoom = zoom;
 
         this._recreateBackground();
-        this._updateCanvas();
+        _updateCanvas(this);
     };
-    
+
     _class.prototype.updateWindowSize = function () {
         // resize
         var view = this._paperProject.view;
@@ -77,14 +113,27 @@
         this.repaint();
     };
 
+    _class.prototype.paintNewCanvas = function () {
+        var canvas = document.createElement("canvas");
+        paper.setup(canvas);
+        paper.view.viewSize = [512, 512];
+        this._recreateAtlas(true);
+        return canvas;
+    };
+
+    // ================================================================================
+    /// overridable
+    // ================================================================================
+
     // recreate all item
     _class.prototype.repaint = function () {
         this._recreateBackground();
     };
 
-    _class.prototype._updateCanvas = function () {
-        this._paperProject.view.update();
-    };
+    // need its paper project activated
+    _class.prototype._recreateAtlas = function () {};
+
+    _class.prototype._doUpdateCanvas = function () {};
     
     // need its paper project activated
     _class.prototype._recreateBackground = function () {
@@ -119,6 +168,10 @@
     _class.prototype._onMouseDown = function (target, event) {};
 
     _class.prototype._onMouseUp = function (target, event) {};
+
+    // ================================================================================
+    /// private
+    // ================================================================================
 
     var _initLayers = function (self) {
         self._cameraLayer = WorkSpace.createLayer(self._paperProject.activeLayer);   // to support viewport movement
@@ -190,6 +243,11 @@
         var x = Math.round((size.width - 512) * 0.5);
         var y = Math.round((size.height - 512) * 0.5);
         self._cameraLayer.position = [x, y];
+    };
+
+    var _updateCanvas = function (self) {
+        self._doUpdateCanvas();
+        self._paperProject.view.update();
     };
 
     return _class;

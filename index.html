@@ -1,68 +1,76 @@
-<html>
+<html ng-app="atlasEditor">
 
 <head>
 <title>Atlas Editor</title>
-<link rel="stylesheet" href="/bin/css/main.css">
 
-<script type="text/javascript" src="/ext/angular/angular.js"></script>
-<script type="text/javascript" src="/bin/js/fireball-core/core.dev.js"></script>
-<script type="text/javascript" src="/bin/js/atlas-editor.dev.js"></script>
+<link rel="stylesheet" href="ext/fontawesome/css/font-awesome.css">
+<link rel="stylesheet" href="ext/fire-editor-ui/editor-ui.css">
+<link rel="stylesheet" href="bin/atlas-editor.css">
+
+<script type="text/javascript" src="ext/angular/angular.min.js"></script>
+<script type="text/javascript" src="ext/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="ext/fire-core/core.min.js"></script>
+<script type="text/javascript" src="ext/fire-editor-ui/editor-ui.js"></script>
+<script type="text/javascript" src="ext/fire-editor-ui/editor-ui-templates.js"></script>
+<script type="text/javascript" src="bin/atlas-editor.js"></script>
 </head>
 
 <body>
+<div id="workspace" class="workspace">
+    <canvas id="atlas-canvas"></canvas>
+</div>
 
-    <div id="workspace" class="workspace">
-        <canvas id="atlas-canvas"></canvas>
-    </div>
+<div id="left-sidebar" class="panel left sidebar">
+</div>
 
-    <div id="left-sidebar" class="panel left sidebar">
-    </div>
+<div ng-controller="AtlasCtrl" id="right-sidebar" class="panel right sidebar">
 
-    <div ng-controller="AtlasCtrl" id="right-sidebar" class="panel right sidebar">
-        <table>
-            <tbody>
-                <tr>
-                    <td>Width</td>
-                    <td><select ng-model="atlas.width" ng-options="size for size in sizes"></select></td>
-                </tr>
-                <tr>
-                    <td>Height</td>
-                    <td><select ng-model="atlas.height" ng-options="size for size in sizes"></select></td>
-                </tr>
-                <tr>                                                                                                                                            
-                    <td>Trim</td>
-                    <td><input type="checkbox" ng-model="atlas.trim"></td>
-                </tr>                                                                                                                                           
-                <tr>                                                                                                                                            
-                    <td>Trim Threshold</td>
-                    <td><input type="number" ng-model="atlas.trimThreshold"></td>
-                </tr>                                                                                                                                           
-                <tr>                                                                                                                                            
-                    <td>Algorithm</td>
-                    <td><select ng-model="atlas.algorithm" ng-options="item.value as item.name for item in algorithmList" ng-change="layout()"></select></td>
-                </tr>                                                                                                                                           
-                <tr>                                                                                                                                            
-                    <td>Sort By</td>
-                    <td><select ng-model="atlas.sortBy" ng-options="item.value as item.name for item in sortByList" ng-change="layout()"></select></td>
-                </tr>                                                                                                                                           
-                <tr>                                                                                                                                            
-                    <td>Sort Order</td>
-                    <td><select ng-model="atlas.sortOrder" ng-options="item.value as item.name for item in sortOrderList" ng-change="layout()"></select></td>
-                </tr>                                                                                                                                           
-                <tr>                                                                                                                                            
-                    <td>Custom Padding</td>
-                    <td><input type="number" ng-model="atlas.customPadding" ng-change="layout()"></td>
-                </tr>                                                                                                                                           
-                <tr>                                                                                                                                            
-                    <td>Allow Rotate</td>
-                    <td><input type="checkbox" ng-model="atlas.allowRotate" ng-change="layout()"></td>
-                </tr>                                                                                                                                           
-            </tbody>
-        </table>
+    <!-- <fire-ui-select fi-bind="atlas.width"></fire-ui-select>                                                 -->
 
-        <button ng-click="export()">Export Atlas</button>                                              
-    </div>
+    <!-- <span class="space"></span>                                                                             -->
 
+    <!-- <fire-ui-select fi-bind="atlas.height"></fire-ui-select>                                                -->
+
+    <!-- <span class="space"></span>                                                                             -->
+
+    <fire-ui-field fi-name="Trim" fi-bind="atlas.trim"></fire-ui-field>                         
+
+    <span class="space"></span>                                                                            
+
+    <fire-ui-field fi-name="Trim Threshold" fi-bind="atlas.trimThreshold" fi-type="int"></fire-ui-field>                         
+
+    <span class="space"></span>                                                                            
+
+    <fire-ui-field fi-name="Algorithm" fi-bind="atlas.algorithm" fi-type="enum" fi-enum-name="FIRE.Atlas.Algorithm"></fire-ui-field>                         
+
+    <span class="space"></span>                                                                            
+
+    <fire-ui-field fi-name="Sort By" fi-bind="atlas.sortBy" fi-type="enum" fi-enum-name="FIRE.Atlas.SortBy"></fire-ui-field>                         
+
+    <span class="space"></span>                                                                            
+
+    <fire-ui-field fi-name="Sort Order" fi-bind="atlas.sortOrder" fi-type="enum" fi-enum-name="FIRE.Atlas.SortOrder"></fire-ui-field>                         
+
+    <span class="space"></span>                                                                            
+
+    <fire-ui-field fi-name="Custom Padding" fi-bind="atlas.customPadding" fi-type="int"></fire-ui-field>                         
+
+    <span class="space"></span>                                                                            
+
+    <fire-ui-field fi-name="Allow Rotate" fi-bind="atlas.allowRotate"></fire-ui-field>                         
+
+    <span class="space"></span>                                                                            
+
+    <fire-ui-field fi-name="Element Background" fi-bind="atlasEditor.elementBgColor"></fire-ui-field>                         
+
+    <span class="space"></span>                                                                            
+
+    <fire-ui-field fi-name="Element Select" fi-bind="atlasEditor.elementSelectColor"></fire-ui-field>                         
+
+    <span class="space"></span>                                                                            
+
+    <button ng-click="export()">Export Atlas</button>                                              
+</div>
 </body>
 
 </html>

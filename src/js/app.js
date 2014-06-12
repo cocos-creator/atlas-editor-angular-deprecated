@@ -9,10 +9,8 @@
 //     } 
 // })();
 
-var app = angular.module('app-atlas-editor', []);
-
-angular.element(document).ready(function() {
-
+angular.module('atlasEditor', ['fireUI'])
+.run( [ '$rootScope', function($rootScope) {
     console.log('starting atlas-editor');
 
     // document events
@@ -44,8 +42,39 @@ angular.element(document).ready(function() {
     };
 
     //
-    app.atlasEditor = atlasEditor;
+    $rootScope.atlasEditor = atlasEditor;
+}])
+.controller( "AtlasCtrl", ["$scope", "$rootScope", function ($scope, $rootScope) {
+    $scope.atlas = $rootScope.atlasEditor.atlas;
+    $scope.sizes = [ 128, 256, 512, 1024, 2048, 4096 ];
+    $scope.atlasEditor = $rootScope.atlasEditor;
 
-    //
-    angular.bootstrap(document, ['app-atlas-editor']);
-});
+    $scope.layout = function () {
+        $scope.atlas.sort();
+        $scope.atlas.layout();
+        $scope.atlasEditor.repaint();
+    };
+
+    var download = function (url, filename) {
+        var a = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
+        a.href = url;
+        a.download = filename;
+        var event = document.createEvent("MouseEvents");
+        event.initMouseEvent("click", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        a.dispatchEvent(event);
+    };
+
+    $scope.export = function () {
+        var dataURL;
+        // export json
+        var json = FIRE.serialize($scope.atlasEditor.atlas);
+        var blob = new Blob([json], {type: "text/plain;charset=utf-8"});    // not support 'application/json'
+        dataURL = (window.URL || window.webkitURL).createObjectURL(blob);
+        download(dataURL, name + ".json");
+        // export png
+        var canvas = $scope.atlasEditor.paintNewCanvas();
+        dataURL = canvas.toDataURL("image/png");
+        download(dataURL, name + ".png");
+    };
+}])
+;

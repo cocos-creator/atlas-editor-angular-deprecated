@@ -9,13 +9,17 @@
         "express": ""
     },
     "devDependencies": {
-        "grunt": "",
-        "grunt-contrib-clean": "",
-        "grunt-contrib-concat": "",
-        "grunt-contrib-copy": "",
-        "grunt-contrib-cssmin": "",
-        "grunt-contrib-jshint": "",
-        "grunt-contrib-uglify": "",
-        "grunt-sass": ""
+        "gulp": "",
+        "gulp-util": "",
+        "gulp-clean": "",
+        "gulp-jshint": "",
+        "jshint-stylish": "",
+        "gulp-concat": "",
+        "gulp-uglify": "",
+        "gulp-uglifyjs": "",
+        "gulp-rename": "",
+        "gulp-stylus": "",
+        "gulp-vulcanize": "",
+        "gulp-angular-templatecache": ""
     }
 }

@@ -2,6 +2,8 @@ var AtlasEditor = (function () {
     function AtlasEditor(ctx) {
         this.atlas = new FIRE.Atlas();
         this.ctx = ctx;
+        this.elementBgColor = new FIRE.Color(1,1,1,0);
+        this.elementSelectColor = new FIRE.Color(0,0,0,1);
     }
 
     // private

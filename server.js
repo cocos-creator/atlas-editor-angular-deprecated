@@ -18,16 +18,9 @@ function error(status, msg) {
     return err;
 }
 
-// // routes
-// app.get('/', function(req, res){
-//     res.sendfile('index.html');
-// });
-
-app.get('/test', function(req, res){
-    res.sendfile('test.html');
-});
-app.get('/test2', function(req, res){
-    res.sendfile('test2.html');
+// routes
+app.get('/', function(req, res){
+    res.sendfile('index.html');
 });
 
 // serves all the static files

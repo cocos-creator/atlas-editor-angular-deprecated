@@ -80,13 +80,14 @@
     // ================================================================================
 
     _class.prototype.setZoom = function (zoom) {
-        var center = paper.view.center;
+        var center = this._paperProject.view.center;
         var offset = this._cameraLayer.position.subtract(center);
         var newOffset = offset.divide(this._zoom).multiply(zoom);
         this._cameraLayer.position = center.add(newOffset).round();
 
         this._zoom = zoom;
 
+        this._paperProject.activate();
         this._recreateBackground();
         _updateCanvas(this);
     };
@@ -127,6 +128,7 @@
 
     // recreate all item
     _class.prototype.repaint = function () {
+        this._paperProject.activate();
         this._recreateBackground();
     };
 

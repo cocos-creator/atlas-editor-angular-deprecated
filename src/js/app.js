@@ -1,14 +1,3 @@
-// (function () {
-//     // document.onreadystatechange = function () {
-//     window.onload = function () {
-//         if (document.readyState == 'complete') {
-//             initApplication();
-//         }
-//     };
-//     function initApplication () {
-//     } 
-// })();
-
 angular.module('atlasEditor', ['fireUI'])
 .run( [ '$rootScope', function($rootScope) {
     console.log('starting atlas-editor');
@@ -44,9 +33,16 @@ angular.module('atlasEditor', ['fireUI'])
     //
     $rootScope.atlasEditor = atlasEditor;
 }])
-.controller( "AtlasCtrl", ["$scope", "$rootScope", function ($scope, $rootScope) {
+.controller( "atlasCtrl", ["$scope", "$rootScope", function ($scope, $rootScope) {
     $scope.atlas = $rootScope.atlasEditor.atlas;
-    $scope.sizes = [ 128, 256, 512, 1024, 2048, 4096 ];
+    $scope.sizeList = [ 
+        { name: '128', value: 128 },
+        { name: '256', value: 256 },
+        { name: '512', value: 512 },
+        { name: '1024', value: 1024 },
+        { name: '2048', value: 2048 },
+        { name: '4096', value: 4096 },
+    ];
     $scope.atlasEditor = $rootScope.atlasEditor;
 
     $scope.layout = function () {

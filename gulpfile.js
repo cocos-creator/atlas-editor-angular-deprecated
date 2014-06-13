@@ -21,6 +21,11 @@ var paths = {
     ],
     img: 'src/img/**/*',
     js: 'src/**/*.js',
+    js_in_order: [
+        'src/js/workSpace.js',
+        'src/js/editor.js',
+        'src/js/app.js',
+    ],
     css: 'src/**/*.styl',
     html: 'src/**/*.html',
 };
@@ -51,7 +56,7 @@ gulp.task('cp-img', function() {
 
 // js
 gulp.task('js', function() {
-    return gulp.src(paths.js, {base: 'src'})
+    return gulp.src(paths.js_in_order, {base: 'src'})
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(concat('atlas-editor.js'))
@@ -61,7 +66,7 @@ gulp.task('js', function() {
 });
 // js-dev
 gulp.task('js-dev', function() {
-    return gulp.src(paths.js, {base: 'src'})
+    return gulp.src(paths.js_in_order, {base: 'src'})
     .pipe(jshint({
         '-W087': true,
     }))

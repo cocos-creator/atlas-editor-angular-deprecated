@@ -8,23 +8,27 @@ angular.module('atlasEditor', ['fireUI'])
 
     // atlasCanvasEL events
     var atlasCanvasEL = document.getElementById('atlas-canvas');
-    atlasCanvasEL.width = 512;
-    atlasCanvasEL.height = 512;
-    var ctx = atlasCanvasEL.getContext("2d");
-
+    atlasCanvasEL.width = atlasCanvasEL.parentNode.clientWidth;
+    atlasCanvasEL.height = atlasCanvasEL.parentNode.clientHeight;
     //
-    var atlasEditor = new AtlasEditor(ctx);
+    var atlasEditor = new AtlasEditor(atlasCanvasEL);
+    window.addEventListener('resize', function() {
+        atlasCanvasEL.width = atlasCanvasEL.parentNode.clientWidth;
+        atlasCanvasEL.height = atlasCanvasEL.parentNode.clientHeight;
+        atlasEditor.updateWindowSize();
+    }, false);
+
     atlasCanvasEL.ondragenter = function(e) {
-        this.style.borderColor = 'blue';
+        atlasEditor.droppingFile(true);
     };
     atlasCanvasEL.ondragover = function(e) {
         e.dataTransfer.dropEffect = 'copy';
     };
     atlasCanvasEL.ondragleave = function(e) {
-        this.style.borderColor = 'black';
+        atlasEditor.droppingFile(false);
     };
     atlasCanvasEL.ondrop = function(e) {
-        this.style.borderColor = 'black';
+        atlasEditor.droppingFile(false);
 
         var files = e.dataTransfer.files;
         atlasEditor.import(files);
@@ -61,16 +65,31 @@ angular.module('atlasEditor', ['fireUI'])
     };
 
     $scope.export = function () {
-        var dataURL;
+        window.navigator.saveBlob = window.navigator.saveBlob || window.navigator.msSaveBlob;
         // export json
-        var json = FIRE.serialize($scope.atlasEditor.atlas);
+        var json = FIRE.serialize(app.atlasEditor.atlas);
         var blob = new Blob([json], {type: "text/plain;charset=utf-8"});    // not support 'application/json'
-        dataURL = (window.URL || window.webkitURL).createObjectURL(blob);
-        download(dataURL, name + ".json");
+        var name = 'atlas';
+        if (window.navigator.saveBlob) {
+            window.navigator.saveBlob(blob, name + ".json");
+        }
+        else {
+            var jsonDataURL = (window.URL || window.webkitURL).createObjectURL(blob);
+            download(jsonDataURL, name + ".json");
+        }
         // export png
-        var canvas = $scope.atlasEditor.paintNewCanvas();
-        dataURL = canvas.toDataURL("image/png");
-        download(dataURL, name + ".png");
+        var canvas = app.atlasEditor.paintNewCanvas();
+        canvas.toBlob = canvas.toBlob || canvas.msToBlob;
+        window.BlobBuilder = window.BlobBuilder || window.MSBlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+        if (window.BlobBuilder && canvas.toBlob && window.navigator.saveBlob) {
+            var blobBuilderObject = new BlobBuilder(); // Create a blob builder object so that we can append content to it.
+            blobBuilderObject.append(canvas.toBlob()); // Append the user's drawing in PNG format to the builder object.
+            window.navigator.saveBlob(blobBuilderObject.getBlob(), name + ".png"); // Move the builder object content to a blob and save it to a file.
+        }
+        else {
+            var pngDataURL = canvas.toDataURL("image/png");
+            download(pngDataURL, name + ".png");
+        }
     };
 }])
 ;

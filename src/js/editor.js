@@ -1,10 +1,10 @@
 var AtlasEditor = (function () {
     var _super = WorkSpace;
 
-    var GRID_COLOR_1 = new paper.Color(204/255, 204/255, 204/255, 1);
-    var GRID_COLOR_2 = new paper.Color(135/255, 135/255, 135/255, 1);
-    var ATLAS_BOUND_COLOR = new paper.Color(0, 0, 1, 0.37);
-    var BORDER_COLOR_HIGHLIGHT = 'blue';
+    var _gridColor1 = new paper.Color(204/255, 204/255, 204/255, 1);
+    var _gridColor2 = new paper.Color(135/255, 135/255, 135/255, 1);
+    var _atlasBoundColor = new paper.Color(0, 0, 1, 0.37);
+    var _borderColorHighlight = 'blue';
     
     function AtlasEditor(canvas) {
         this._selection = [];
@@ -19,8 +19,7 @@ var AtlasEditor = (function () {
         
         _initLayers(this);
     }
-    var _class = AtlasEditor;
-    FIRE.extend(_class, _super);
+    FIRE.extend(AtlasEditor, _super);
 
     var _initLayers = function (self) {
         //self._atlasBgLayer = WorkSpace.createLayer();
@@ -44,7 +43,7 @@ var AtlasEditor = (function () {
     };
     var _processing = 0;
 
-    _class.prototype._onMouseDown = function (target, event) {
+    AtlasEditor.prototype._onMouseDown = function (target, event) {
         if (_super.prototype._onMouseDown.call(this, target, event) === false) {
             return false;
         }
@@ -56,7 +55,7 @@ var AtlasEditor = (function () {
         }
     };
 
-    _class.prototype._onMouseUp = function (target, event) {
+    AtlasEditor.prototype._onMouseUp = function (target, event) {
         if (_super.prototype._onMouseUp.call(this, target, event) === false) {
             return false;
         }
@@ -66,7 +65,7 @@ var AtlasEditor = (function () {
         }
     };
 
-    _class.prototype._onMouseDrag = function (target, event) {
+    AtlasEditor.prototype._onMouseDrag = function (target, event) {
         if (_super.prototype._onMouseDrag.call(this, target, event) === false) {
             return false;
         }
@@ -123,7 +122,7 @@ var AtlasEditor = (function () {
     };
 
     //
-    _class.prototype.import = function ( files ) {
+    AtlasEditor.prototype.import = function ( files ) {
         for (var i = 0; i < files.length; ++i) {
             file = files[i];
             if ( _acceptedTypes[file.type] === true ) {
@@ -179,11 +178,11 @@ var AtlasEditor = (function () {
     };
 
     // need its paper project activated
-    _class.prototype._recreateBackground = function () {
+    AtlasEditor.prototype._recreateBackground = function () {
         _super.prototype._recreateBackground.call(this);
         
         // draw rect
-        this._border.fillColor = GRID_COLOR_1;
+        this._border.fillColor = _gridColor1;
         this.droppingFile(false);
         // draw checkerboard
         var posFilter = Math.round;
@@ -191,7 +190,7 @@ var AtlasEditor = (function () {
         var zoomedGridSize = sizeFilter(this._gridSize * this._zoom);
         var template = new paper.Shape.Rectangle(0, 0, zoomedGridSize, zoomedGridSize);
         template.remove();
-        template.fillColor = GRID_COLOR_2;
+        template.fillColor = _gridColor2;
         template.pivot = [-zoomedGridSize/2, -zoomedGridSize/2];
         var symbol = new paper.Symbol(template);
         for (var x = 0; x < 512; x += this._gridSize) {
@@ -203,7 +202,7 @@ var AtlasEditor = (function () {
         }
     };
 
-    _class.prototype._recreateAtlas = function (forExport) {
+    AtlasEditor.prototype._recreateAtlas = function (forExport) {
         var self = this;
         var onDown, onUp;
         if (!forExport) {
@@ -252,7 +251,7 @@ var AtlasEditor = (function () {
         paper.view.update();
     };
 
-    _class.prototype._doUpdateCanvas = function () {
+    AtlasEditor.prototype._doUpdateCanvas = function () {
         _super.prototype._doUpdateCanvas.call(this);
         _updateAtlas(this, false);
     };
@@ -279,7 +278,7 @@ var AtlasEditor = (function () {
             var bounds = child.data.boundsItem;
             bounds.size = [w, h];
             bounds.position = new paper.Rectangle(left, top, w, h).center;
-            bounds.fillColor = ATLAS_BOUND_COLOR;
+            bounds.fillColor = _atlasBoundColor;
             // update outline
             var outline = child.data.outline;
             if (outline) {
@@ -290,16 +289,16 @@ var AtlasEditor = (function () {
         //paper.view.draw();
     };
 
-    _class.prototype.repaint = function () {
+    AtlasEditor.prototype.repaint = function () {
         _super.prototype.repaint.call(this);
         this._recreateAtlas(false);
     };
 
     //
-    _class.prototype.droppingFile = function (dropping) {
-        this._border.strokeColor = dropping ? BORDER_COLOR_HIGHLIGHT : WorkSpace.BORDER_COLOR;
+    AtlasEditor.prototype.droppingFile = function (dropping) {
+        this._border.strokeColor = dropping ? _borderColorHighlight : WorkSpace.borderColor;
         this._paperProject.view.update();
     };
 
-    return _class;
+    return AtlasEditor;
 })();

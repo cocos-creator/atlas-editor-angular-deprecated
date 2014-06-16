@@ -22,15 +22,14 @@
 
         _bindEvents(this);
     }
-    var _class = WorkSpace;
 
     // ================================================================================
     /// static
     // ================================================================================
 
-    _class.BORDER_COLOR = new paper.Color(0.08, 0.08, 0.08, 1);
+    WorkSpace.borderColor = new paper.Color(0.08, 0.08, 0.08, 1);
 
-    _class.createLayer = function (existedLayer) {
+    WorkSpace.createLayer = function (existedLayer) {
         existedLayer = existedLayer || new paper.Layer(paper.Item.NO_INSERT);
         existedLayer.applyMatrix = false;
         existedLayer.position = [0, 0];   // in paper, position should be settled before pivot
@@ -38,7 +37,7 @@
         return existedLayer;
     };
 
-    _class.createSpriteRaster = function (tex) {
+    WorkSpace.createSpriteRaster = function (tex) {
         var tmpRawRaster = new paper.Raster(tex.image);
         var trimRect = new paper.Rectangle(tex.trimX, tex.trimY, tex.width, tex.height);
         var raster = tmpRawRaster.getSubRaster(trimRect);
@@ -51,7 +50,7 @@
         return raster;
     };
 
-    _class.createAtlasRasters = function (atlas, addBounds, onMouseDown, onMouseUp) {
+    WorkSpace.createAtlasRasters = function (atlas, addBounds, onMouseDown, onMouseUp) {
         console.time('create raster');
         for (var i = 0; i < atlas.textures.length; ++i) {
             var tex = atlas.textures[i];
@@ -79,7 +78,7 @@
     /// public
     // ================================================================================
 
-    _class.prototype.setZoom = function (zoom) {
+    WorkSpace.prototype.setZoom = function (zoom) {
         var center = this._paperProject.view.center;
         var offset = this._cameraLayer.position.subtract(center);
         var newOffset = offset.divide(this._zoom).multiply(zoom);
@@ -92,7 +91,7 @@
         _updateCanvas(this);
     };
 
-    _class.prototype.updateWindowSize = function () {
+    WorkSpace.prototype.updateWindowSize = function () {
         // resize
         var view = this._paperProject.view;
         view.viewSize = [view.element.width, view.element.height];
@@ -114,7 +113,7 @@
         this.repaint();
     };
 
-    _class.prototype.paintNewCanvas = function () {
+    WorkSpace.prototype.paintNewCanvas = function () {
         var canvas = document.createElement("canvas");
         paper.setup(canvas);
         paper.view.viewSize = [512, 512];
@@ -127,18 +126,18 @@
     // ================================================================================
 
     // recreate all item
-    _class.prototype.repaint = function () {
+    WorkSpace.prototype.repaint = function () {
         this._paperProject.activate();
         this._recreateBackground();
     };
 
     // need its paper project activated
-    _class.prototype._recreateAtlas = function () {};
+    WorkSpace.prototype._recreateAtlas = function () {};
 
-    _class.prototype._doUpdateCanvas = function () {};
+    WorkSpace.prototype._doUpdateCanvas = function () {};
     
     // need its paper project activated
-    _class.prototype._recreateBackground = function () {
+    WorkSpace.prototype._recreateBackground = function () {
         this._bgLayer.activate();
         this._bgLayer.removeChildren();
         var borderWidth = 2;
@@ -150,14 +149,14 @@
         //this._border.fillColor = new paper.Color(204/255, 204/255, 204/255, 1);
         this._border.style = {
             strokeWidth: borderWidth,
-            strokeColor: WorkSpace.BORDER_COLOR,
+            strokeColor: WorkSpace.borderColor,
             shadowColor: [0, 0, 0, 0.5],
             shadowBlur: 7,
             shadowOffset: new paper.Point(2, 2),
         };
     };
 
-    _class.prototype._onMouseDrag = function (target, event) {
+    WorkSpace.prototype._onMouseDrag = function (target, event) {
         var rightButtonDown = event.event.which === 3;
         rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
         if (rightButtonDown) {
@@ -167,9 +166,9 @@
         }
     };
 
-    _class.prototype._onMouseDown = function (target, event) {};
+    WorkSpace.prototype._onMouseDown = function (target, event) {};
 
-    _class.prototype._onMouseUp = function (target, event) {};
+    WorkSpace.prototype._onMouseUp = function (target, event) {};
 
     // ================================================================================
     /// private
@@ -252,5 +251,5 @@
         self._paperProject.view.update();
     };
 
-    return _class;
+    return WorkSpace;
 })();

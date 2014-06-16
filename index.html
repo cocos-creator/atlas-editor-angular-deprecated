@@ -17,14 +17,14 @@
 </head>
 
 <body>
-<div id="workspace" class="workspace">
-    <canvas id="atlas-canvas"></canvas>
+<div ng-controller="workSpaceCtrl" id="workspace" class="workspace">
+    <free-move-paper id="canvas"></free-move-paper>
 </div>
 
 <div id="left-sidebar" class="panel left sidebar">
 </div>
 
-<div ng-controller="atlasCtrl" id="right-sidebar" class="panel right sidebar">
+<div ng-controller="rightPanelCtrl" id="right-sidebar" class="panel right sidebar">
     <fire-ui-field fi-name="Width" fi-bind="atlas.width" fi-type="enum" fi-enum-list="sizeList"></fire-ui-field>                           
     <fire-ui-field fi-name="Height" fi-bind="atlas.height" fi-type="enum" fi-enum-list="sizeList"></fire-ui-field>                         
     <fire-ui-field fi-name="Trim" fi-bind="atlas.trim"></fire-ui-field>                         
@@ -49,10 +49,11 @@
     </div>
 
     <span class="space"></span>                                                                            
-    <fire-ui-field fi-name="Element Background" fi-bind="atlasEditor.elementBgColor"></fire-ui-field>                         
-    <fire-ui-field fi-name="Element Select" fi-bind="atlasEditor.elementSelectColor"></fire-ui-field>                         
+    <!-- <fire-ui-field fi-name="Element Background" fi-bind="atlasEditor.elementBgColor"></fire-ui-field>                          -->
+    <!-- <fire-ui-field fi-name="Element Select" fi-bind="atlasEditor.elementSelectColor"></fire-ui-field>                          -->
 
     <button ng-click="export()">Export Atlas</button>                                              
+    <button ng-click="layout()">Layout</button>                                              
 </div>
 </body>
 

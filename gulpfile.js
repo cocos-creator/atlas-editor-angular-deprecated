@@ -22,9 +22,13 @@ var paths = {
     img: 'src/img/**/*',
     js: 'src/**/*.js',
     js_in_order: [
-        'src/js/workSpace.js',
-        'src/js/editor.js',
+        'src/js/paperUtils.js',
         'src/js/app.js',
+        'src/js/freeMovePaper.js',
+        'src/js/rightPanelCtrl.js',
+        'src/js/workSpaceCtrl.js',
+
+        'src/js/editors.js',
     ],
     css: 'src/**/*.styl',
     html: 'src/**/*.html',

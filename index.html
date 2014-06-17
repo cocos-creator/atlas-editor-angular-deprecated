@@ -18,7 +18,7 @@
 
 <body>
 <div ng-controller="workSpaceCtrl" id="workspace" class="workspace">
-    <free-move-paper id="canvas"></free-move-paper>
+    <free-move-paper id="canvas" zoom="zoom"></free-move-paper>
 </div>
 
 <div id="left-sidebar" class="panel left sidebar">
@@ -49,8 +49,8 @@
     </div>
 
     <span class="space"></span>                                                                            
-    <!-- <fire-ui-field fi-name="Element Background" fi-bind="atlasEditor.elementBgColor"></fire-ui-field>                          -->
-    <!-- <fire-ui-field fi-name="Element Select" fi-bind="atlasEditor.elementSelectColor"></fire-ui-field>                          -->
+    <fire-ui-field fi-name="Element Background" fi-bind="editor.elementBgColor"></fire-ui-field>                         
+    <fire-ui-field fi-name="Element Select" fi-bind="editor.elementSelectColor"></fire-ui-field>                         
 
     <button ng-click="export()">Export Atlas</button>                                              
     <button ng-click="layout()">Layout</button>                                              

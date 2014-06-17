@@ -1,5 +1,5 @@
 angular.module('atlasEditor')
-.controller( "rightPanelCtrl", ["$scope", "$atlas", function ($scope, $atlas) {
+.controller( "rightPanelCtrl", ["$scope", "$atlas", "$editor", function ($scope, $atlas, $editor) {
     $scope.sizeList = [ 
         { name: '128', value: 128 },
         { name: '256', value: 256 },
@@ -9,6 +9,7 @@ angular.module('atlasEditor')
         { name: '4096', value: 4096 },
     ];
     $scope.atlas = $atlas.data;
+    $scope.editor = $editor;
 
     $scope.layout = function () {
         $atlas.layout();

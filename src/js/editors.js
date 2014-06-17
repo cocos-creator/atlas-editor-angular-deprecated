@@ -43,10 +43,6 @@ var WorkSpace = (function () {
         var raster = tmpRawRaster.getSubRaster(trimRect);
         tmpRawRaster.remove();  // can only be removed after getSubRaster
         raster.pivot = [-tex.width * 0.5, -tex.height * 0.5];
-        if (tex.rotated) {
-            raster.pivot = [raster.pivot.x, -raster.pivot.y];
-            raster.rotation = 90;
-        }
         return raster;
     };
 

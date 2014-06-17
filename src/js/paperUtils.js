@@ -22,4 +22,8 @@ var PaperUtils;
         return newLayer;
     };
 
+    PaperUtils.color = function (color) {
+        return new paper.Color(color.r, color.g, color.b, color.a);
+    };
+
 })(PaperUtils || (PaperUtils = {}));

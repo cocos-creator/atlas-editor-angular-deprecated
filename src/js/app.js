@@ -1,16 +1,23 @@
 angular.module('atlasEditor', ['fireUI'])
-.factory ( '$atlas', function () {
+.factory ( '$atlas', ['$rootScope', function ($rootScope) {
     var atlas = {};
     atlas.data = new FIRE.Atlas();
     atlas.layout = function () {
         this.data.sort();
         this.data.layout();
-        // TODO: atlasEditor.repaint();
+        $rootScope.$broadcast( 'repaint', true );
     };
 
     return atlas;
+}])
+.factory ( '$editor', function () {
+    var editor = {};
+    editor.elementBgColor = new FIRE.Color( 0, 0.28, 1, 0.5 );
+    editor.elementSelectColor = new FIRE.Color(0,0,0,1);
+
+    return editor;
 })
-.run( [ '$atlas', function($atlas) {
+.run( ['$atlas', function($atlas) {
     console.log('starting atlas-editor');
 
     // document events

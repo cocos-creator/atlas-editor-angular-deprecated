@@ -1,17 +1,44 @@
 angular.module('atlasEditor')
-.controller( "workSpaceCtrl", ["$scope", "$element", "$atlas", function ($scope, $element, $atlas) {
+.controller( "workSpaceCtrl", ["$scope", "$element", "$atlas", "$editor", function ($scope, $element, $atlas, $editor) {
     $scope.atlas = $atlas.data;
+    $scope.editor = $editor;
     $scope.zoom = 1.0;
 
     $scope.$watchGroup ( [
         'atlas.width', 
         'atlas.height', 
     ], function ( val, old ) {
-        $scope.atlas.sort();
         $scope.atlas.layout();
         $scope.zoom = 1;
         $scope.$broadcast( 'centerViewport', $scope.atlas.width, $scope.atlas.height);
         $scope.$broadcast( 'repaint', true );
+    }); 
+
+    $scope.$watchGroup ( [
+        'atlas.customPadding',
+        'atlas.algorithm',
+        'atlas.sortBy',
+        'atlas.sortOrder',
+        'atlas.allowRotate',
+    ], function ( val, old ) {
+        $scope.atlas.sort();
+        $scope.atlas.layout();
+        $scope.updateAtlas();
+        $scope.project.view.update();
+    }); 
+
+    $scope.$watchGroup ( [
+        'editor.elementBgColor.r',
+        'editor.elementBgColor.g',
+        'editor.elementBgColor.b',
+        'editor.elementBgColor.a',
+        'editor.elementSelectColor.r',
+        'editor.elementSelectColor.g',
+        'editor.elementSelectColor.b',
+        'editor.elementSelectColor.a',
+    ], function ( val, old ) {
+        $scope.updateAtlas();
+        $scope.project.view.update();
     }); 
 
     $scope.$watch ( 'zoom', function ( val, old ) {
@@ -254,7 +281,7 @@ angular.module('atlasEditor')
             var bounds = child.data.boundsItem;
             bounds.size = [w, h];
             bounds.position = new paper.Rectangle(left, top, w, h).center;
-            bounds.fillColor = new paper.Color(0, 0, 1, 0.37);
+            bounds.fillColor = PaperUtils.color( $scope.editor.elementBgColor );
 
             // update outline
             var outline = child.data.outline;

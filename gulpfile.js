@@ -5,11 +5,9 @@ var clean = require('gulp-clean');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var concat = require('gulp-concat');
-var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 // var uglifyjs = require('gulp-uglifyjs');
 var stylus = require('gulp-stylus');
-var vulcanize = require('gulp-vulcanize');
 var templateCache = require('gulp-angular-templatecache');
 
 var paths = {

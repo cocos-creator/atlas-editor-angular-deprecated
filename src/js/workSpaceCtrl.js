@@ -1,5 +1,37 @@
 angular.module('atlasEditor')
 .controller( "workSpaceCtrl", ["$scope", "$element", "$atlas", "$editor", function ($scope, $element, $atlas, $editor) {
+    //
+    function createCheckerboard ( width, height ) {
+        var tmpLayer = PaperUtils.createLayer();
+        tmpLayer.activate();
+
+        var gridColor2 = new paper.Color(135/255, 135/255, 135/255, 1);
+        var gridSize = 32;
+        var posFilter = Math.round;
+        var sizeFilter = Math.floor;
+        var zoomedGridSize = sizeFilter(gridSize * $scope.zoom);
+        var template = new paper.Shape.Rectangle(0, 0, zoomedGridSize, zoomedGridSize);
+        template.remove();
+        template.fillColor = gridColor2;
+        template.pivot = [-zoomedGridSize/2, -zoomedGridSize/2];
+        var symbol = new paper.Symbol(template);
+        for (var x = 0; x < width; x += gridSize) {
+            for (var y = 0; y < height; y += gridSize) {
+                if (x % (gridSize * 2) !== y % (gridSize * 2)) {
+                    symbol.place([posFilter(x * $scope.zoom), posFilter(y * $scope.zoom)]);
+                }
+            }
+        }
+
+        var raster = tmpLayer.rasterize();
+        tmpLayer.remove();
+
+        raster.pivot = [-raster.width*0.5,-raster.height*0.5];
+        raster.position = [0,0];
+
+        return raster;
+    }
+
     $scope.atlas = $atlas.data;
     $scope.editor = $editor;
     $scope.zoom = 1.0;
@@ -10,6 +42,13 @@ angular.module('atlasEditor')
     ], function ( val, old ) {
         $scope.atlas.layout();
         $scope.zoom = 1;
+
+        if ( $scope.checkerboard !== undefined ) {
+            $scope.checkerboard.remove();
+        }
+        $scope.checkerboard = createCheckerboard( $scope.atlas.width, $scope.atlas.height );
+        $scope.atlasBGLayer.addChild($scope.checkerboard);
+
         $scope.$broadcast( 'centerViewport', $scope.atlas.width, $scope.atlas.height);
         $scope.$broadcast( 'repaint', true );
     }); 
@@ -49,12 +88,12 @@ angular.module('atlasEditor')
         $scope.project = project;
         $scope.rootLayer = rootLayer;
 
-        $scope.bgLayer = PaperUtils.createLayer();
+        $scope.atlasBGLayer = PaperUtils.createLayer();
         $scope.atlasLayer = PaperUtils.createLayer(); // to draw atlas bounds & texture
         $scope.atlasHandlerLayer = PaperUtils.createLayer(); // to draw outline of selected atlas
 
         rootLayer.addChildren ([
-            $scope.bgLayer,
+            $scope.atlasBGLayer,
             $scope.atlasLayer,
             $scope.atlasHandlerLayer,
         ]);
@@ -62,41 +101,32 @@ angular.module('atlasEditor')
     });
 
     $scope.$on( 'paint', function ( event ) { 
-        $scope.bgLayer.activate();
-        $scope.bgLayer.removeChildren();
+        $scope.atlasBGLayer.activate();
         var borderWidth = 2;
 
         // draw rect
         var borderRect = new paper.Rectangle(0, 0, $scope.atlas.width * $scope.zoom, $scope.atlas.height * $scope.zoom);
         borderRect = borderRect.expand(borderWidth);
-        $scope.border = new paper.Shape.Rectangle(borderRect);
-        $scope.border.style = {
-            fillColor: new paper.Color(204/255, 204/255, 204/255, 1),
-            strokeWidth: borderWidth,
-            strokeColor: new paper.Color(0.08, 0.08, 0.08, 1),
-            shadowColor: [0, 0, 0, 0.5],
-            shadowBlur: 7,
-            shadowOffset: new paper.Point(2, 2),
-        };
+        if ( $scope.border === undefined ) {
+            $scope.border = new paper.Shape.Rectangle(borderRect);
+            $scope.border.style = {
+                fillColor: new paper.Color(204/255, 204/255, 204/255, 1),
+                strokeWidth: borderWidth,
+                strokeColor: new paper.Color(0.08, 0.08, 0.08, 1),
+                shadowColor: [0, 0, 0, 0.5],
+                shadowBlur: 7,
+                shadowOffset: new paper.Point(2, 2),
+            };
+        }
+        $scope.border.size = borderRect.size;
+        $scope.border.position = [($scope.border.size.width-borderWidth) * 0.5, ($scope.border.size.height-borderWidth) * 0.5];
 
-        // // draw checkerboard
-        // var gridColor2 = new paper.Color(135/255, 135/255, 135/255, 1);
-        // var gridSize = 32;
-        // var posFilter = Math.round;
-        // var sizeFilter = Math.floor;
-        // var zoomedGridSize = sizeFilter(gridSize * $scope.zoom);
-        // var template = new paper.Shape.Rectangle(0, 0, zoomedGridSize, zoomedGridSize);
-        // template.remove();
-        // template.fillColor = gridColor2;
-        // template.pivot = [-zoomedGridSize/2, -zoomedGridSize/2];
-        // var symbol = new paper.Symbol(template);
-        // for (var x = 0; x < $scope.atlas.width; x += gridSize) {
-        //     for (var y = 0; y < $scope.atlas.height; y += gridSize) {
-        //         if (x % (gridSize * 2) !== y % (gridSize * 2)) {
-        //             symbol.place([posFilter(x * $scope.zoom), posFilter(y * $scope.zoom)]);
-        //         }
-        //     }
-        // }
+        // draw checkerboard
+        if ( $scope.checkerboard === undefined ) {
+            $scope.checkerboard = createCheckerboard( $scope.atlas.width, $scope.atlas.height );
+            $scope.atlasBGLayer.addChild($scope.checkerboard);
+        }
+        $scope.checkerboard.scaling = [$scope.zoom, $scope.zoom ];
 
         //
         $scope.updateAtlas();
@@ -176,7 +206,7 @@ angular.module('atlasEditor')
             if ( processing === 0 ) {
                 $scope.atlas.sort();
                 $scope.atlas.layout();
-                $scope.recreateAtlas(false);
+                $scope.rebuildAtlas(false);
                 return;
             }
             setTimeout( checkIfFinished, 500 );
@@ -185,7 +215,7 @@ angular.module('atlasEditor')
     };
 
     //
-    $scope.recreateAtlas = function (forExport) {
+    $scope.rebuildAtlas = function (forExport) {
         var onMouseDown, onMouseUp;
         if (!forExport) {
             onMouseDown = function (event) {

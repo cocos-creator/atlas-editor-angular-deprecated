@@ -88,10 +88,11 @@ angular.module('atlasEditor')
         $scope.project.view.update();
     }); 
 
-    $scope.$on( 'initScene', function ( event, project, sceneLayer, handlerLayer ) { 
+    $scope.$on( 'initScene', function ( event, project, sceneLayer, fgLayer, bgLayer ) { 
         $scope.project = project;
         $scope.sceneLayer = sceneLayer;
-        $scope.handlerLayer = handlerLayer;
+        $scope.fgLayer = fgLayer;
+        $scope.bgLayer = bgLayer;
 
         $scope.atlasBGLayer = PaperUtils.createLayer();
         $scope.atlasBGLayer.position = [-$scope.atlas.width*0.5, -$scope.atlas.height*0.5];
@@ -155,6 +156,11 @@ angular.module('atlasEditor')
 
         var files = event.dataTransfer.files;
         $scope.import(files);
+    } );
+
+    $scope.$on( 'zoomChanged', function () { 
+        // $scope.atlasLayer.scale( 1.0/$scope.atlasLayer.globalMatrix.scaling.x,
+        //                          1.0/$scope.atlasLayer.globalMatrix.scaling.y );
     } );
 
     //
@@ -255,23 +261,23 @@ angular.module('atlasEditor')
             $scope.atlasLayer.activate();
         }
 
-        console.time('create raster');
-        for (var i = 0; i < $scope.atlas.textures.length; ++i) {
+        var i = 0;
+        for (i = 0; i < $scope.atlas.textures.length; ++i) {
             var tex = $scope.atlas.textures[i];
             var raster = PaperUtils.createSpriteRaster(tex);
             raster.data.texture = tex;
+            raster.position = [tex.x, tex.y];
+
             if ( !forExport ) {
-                raster.data.boundsItem = new paper.Shape.Rectangle(paper.Item.NO_INSERT);
-                raster.data.boundsItem.insertBelow(raster);
-                // bind events
-                raster.onMouseDown = onMouseDown;
-                raster.onMouseUp = onMouseUp;
-            }
-            else {
-                raster.position = [tex.x, tex.y];
+                raster.data.bgItem = new paper.Shape.Rectangle(paper.Item.NO_INSERT);
+                $scope.bgLayer.addChild(raster.data.bgItem);
+
+                // raster.data.bgItem.insertBelow(raster);
+                // // bind events
+                // raster.onMouseDown = onMouseDown;
+                // raster.onMouseUp = onMouseUp;
             }
         }
-        console.timeEnd('create raster');
 
         if (!forExport) {
             $scope.paintAtlas();
@@ -307,16 +313,16 @@ angular.module('atlasEditor')
             var top = posFilter(tex.y);
             var w = posFilter(tex.rotatedWidth);
             var h = posFilter(tex.rotatedHeight);
-            var bounds = child.data.boundsItem;
-            bounds.size = [w, h];
-            bounds.position = new paper.Rectangle(left, top, w, h).center;
-            bounds.fillColor = PaperUtils.color( $scope.editor.elementBgColor );
+            var bgItem = child.data.bgItem;
+            bgItem.size = [w, h];
+            bgItem.position = new paper.Rectangle(left, top, w, h).center;
+            bgItem.fillColor = PaperUtils.color( $scope.editor.elementBgColor );
 
             // update outline
             var outline = child.data.outline;
             if (outline) {
-                outline.position = bounds.position;
-                outline.size = bounds.size;
+                outline.position = bgItem.position;
+                outline.size = bgItem.size;
             }
         }
     };

@@ -96,9 +96,12 @@
             //     }
             // }, 10 );
 
-            scope.zoom = zoom;
-            scope.rootLayer.scaling = [zoom, zoom];
-            scope.project.view.update();
+            if ( scope.zoom != zoom ) {
+                scope.zoom = zoom;
+                scope.rootLayer.scaling = [zoom, zoom];
+                scope.project.view.update();
+                scope.$emit('zoomChanged');
+            }
         };
 
         scope.setPos = function ( x, y ) {
@@ -137,18 +140,31 @@
         scope.project.view.viewSize = viewSize; // to prevent canvas resizing during paper.setup
 
         scope.project.activate();
+
+        // rootLayer
         scope.rootLayer = scope.project.activeLayer;
         scope.rootLayer.applyMatrix = false;
         scope.rootLayer.position = [viewSize.width * 0.5, viewSize.height * 0.5];
         scope.rootLayer.pivot = [0,0];
 
+        // bglayer
+        scope.bgLayer = PaperUtils.createLayer();
+        scope.bgLayer.position = [viewSize.width * 0.5, viewSize.height * 0.5];
+        scope.bgLayer.pivot = [0,0];
+        scope.project.layers.unshift(scope.bgLayer);
+
+        // fgLayer
+        scope.fgLayer = PaperUtils.createLayer();
+        scope.fgLayer.position = [viewSize.width * 0.5, viewSize.height * 0.5];
+        scope.fgLayer.pivot = [0,0];
+        scope.project.layers.push(scope.fgLayer);
+
         scope.sceneLayer = PaperUtils.createLayer();
-        scope.handlerLayer = PaperUtils.createLayer();
         scope.rootLayer.addChildren ([
             scope.sceneLayer,
-            scope.handlerLayer,
         ]);
-        scope.$emit( 'initScene', scope.project, scope.sceneLayer, scope.handlerLayer );
+
+        scope.$emit( 'initScene', scope.project, scope.sceneLayer, scope.fgLayer, scope.bgLayer );
         scope.repaint();
 
         // Debug:
@@ -175,6 +191,14 @@
                 scope.sceneLayer.position = [
                     scope.sceneLayer.position.x + event.delta.x / scope.zoom,
                     scope.sceneLayer.position.y + event.delta.y / scope.zoom,
+                ];
+                scope.bgLayer.position = [ 
+                    scope.bgLayer.position.x + event.delta.x,
+                    scope.bgLayer.position.y + event.delta.y,
+                ];
+                scope.fgLayer.position = [ 
+                    scope.fgLayer.position.x + event.delta.x,
+                    scope.fgLayer.position.y + event.delta.y,
                 ];
                 return;
             }

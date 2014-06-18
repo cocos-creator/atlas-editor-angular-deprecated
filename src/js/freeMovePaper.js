@@ -46,13 +46,20 @@
         };
 
         // init scope 
+        scope.zoom = 1.0;
         scope.resize = function ( width, height ) {
             canvasEL.width = width;
             canvasEL.height = height;
 
             // resize
             var view = scope.project.view;
-            view.viewSize = [view.element.width, view.element.height];
+            var oldSize = view.viewSize;
+
+            view.viewSize = [width, height];
+            scope.sceneLayer.position = [ 
+                scope.sceneLayer.position.x * (width/oldSize.width), 
+                scope.sceneLayer.position.y * (height/oldSize.height)
+            ];
 
             scope.repaint();
         };
@@ -79,9 +86,9 @@
             //     var curZoom = src + (dest - src) * ratio;
 
             //     var center = scope.project.view.center;
-            //     var offset = scope.rootLayer.position.subtract(center);
+            //     var offset = scope.sceneLayer.position.subtract(center);
             //     var newOffset = offset.divide(scope.zoom).multiply(curZoom);
-            //     scope.rootLayer.position = center.add(newOffset).round();
+            //     scope.sceneLayer.position = center.add(newOffset).round();
             //     scope.zoom = curZoom;
 
             //     if ( totalSeconds > 0.2 ) {
@@ -89,19 +96,21 @@
             //     }
             // }, 10 );
 
-            var center = scope.project.view.center;
-            var offset = scope.rootLayer.position.subtract(center);
-            var newOffset = offset.divide(scope.zoom).multiply(zoom);
-            scope.rootLayer.position = center.add(newOffset).round();
             scope.zoom = zoom;
-            scope.$apply();
+            scope.rootLayer.scaling = [zoom, zoom];
+            scope.project.view.update();
         };
 
-        scope.$on( 'centerViewport', function ( event, width, height ) {
-            var size = scope.project.view.viewSize;
-            var x = Math.round((size.width - width) * 0.5);
-            var y = Math.round((size.height - height) * 0.5);
-            scope.rootLayer.position = [x,y];
+        scope.setPos = function ( x, y ) {
+            scope.sceneLayer.position = [x, y];
+        };
+
+        scope.$on( 'moveTo', function ( event, x, y ) {
+            scope.setPos(x,y);
+        });
+
+        scope.$on( 'zoom', function ( event, zoom ) {
+            scope.setZoom(zoom);
         });
 
         scope.$on ( 'repaint', function ( event, repaintAll ) {
@@ -120,55 +129,98 @@
             window.removeEventListener(resizeEventID);
         });
 
+        var viewSize = new paper.Size(canvasEL.width, canvasEL.height);
+
         // init 
         paper.setup(canvasEL);
         scope.project = paper.project;
-        scope.project.view.viewSize = [canvasEL.width, canvasEL.height]; // to prevent canvas resizing during paper.setup
+        scope.project.view.viewSize = viewSize; // to prevent canvas resizing during paper.setup
 
         scope.project.activate();
-        if ( scope.project.activeLayer !== null ) {
-            scope.project.activeLayer.remove();
-        }
-        scope.rootLayer = PaperUtils.createLayer();
-        scope.project.layers.push(scope.rootLayer);
-        scope.$emit( 'initPaper', scope.project, scope.rootLayer );
+        scope.rootLayer = scope.project.activeLayer;
+        scope.rootLayer.applyMatrix = false;
+        scope.rootLayer.position = [viewSize.width * 0.5, viewSize.height * 0.5];
+        scope.rootLayer.pivot = [0,0];
+
+        scope.sceneLayer = PaperUtils.createLayer();
+        scope.handlerLayer = PaperUtils.createLayer();
+        scope.rootLayer.addChildren ([
+            scope.sceneLayer,
+            scope.handlerLayer,
+        ]);
+        scope.$emit( 'initScene', scope.project, scope.sceneLayer, scope.handlerLayer );
         scope.repaint();
 
+        // Debug:
+        // scope.rootLayer.activate();
+        // var path = new paper.Path.Line([0,0], [999,0]);
+        // path.strokeColor = 'red';
+        // path = new paper.Path.Line([0,0], [0,999]);
+        // path.strokeColor = 'green';
+
+        // scope.sceneLayer.activate();
+        // path = new paper.Path.Line([0,0], [999,0]);
+        // path.strokeColor = 'black';
+        // path = new paper.Path.Line([0,0], [0,999]);
+        // path.strokeColor = 'black';
 
         //
         var tool = new paper.Tool();
         tool.onMouseDrag = function (event) {
+            // process drag
             var rightButtonDown = event.event.which === 3;
             rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
             if (rightButtonDown) {
                 // drag viewport
-                scope.rootLayer.position = scope.rootLayer.position.add(event.delta);
-                return false;
+                scope.sceneLayer.position = [
+                    scope.sceneLayer.position.x + event.delta.x / scope.zoom,
+                    scope.sceneLayer.position.y + event.delta.y / scope.zoom,
+                ];
+                return;
             }
         };
-        // tool.onMouseDown = function (event) {
-        //     // if (event.event.which === 1) {
-        //     //     if ((!event.item || event.item.layer !== this._atlasLayer) && !(event.modifiers.control || event.modifiers.command)) {
-        //     //         _clearSelection(this);
-        //     //         return false;
-        //     //     }
-        //     // }
-        // };
-        // tool.onMouseUp = function (event) {
-        //     // if (event.event.which === 1) {
-        //     //     this._atlasDragged = false;
-        //     //     return false;
-        //     // }
-        // };
+        tool.onMouseDown = function (event) {
+            canvasEL.focus();
+
+            // process drag
+            var rightButtonDown = event.event.which === 3;
+            rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
+            if (rightButtonDown) {
+                canvasEL.style.cursor = 'move';
+                FIRE.addDragGhost("move");
+                return;
+            }
+
+            // if (event.event.which === 1) {
+            //     if ((!event.item || event.item.layer !== this._atlasLayer) && !(event.modifiers.control || event.modifiers.command)) {
+            //         _clearSelection(this);
+            //         return false;
+            //     }
+            // }
+        };
+        tool.onMouseUp = function (event) {
+            // process drag release
+            var rightButtonDown = event.event.which === 3;
+            rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
+            if (rightButtonDown) {
+                canvasEL.style.cursor = 'auto';
+                FIRE.removeDragGhost();
+                return;
+            }
+
+            // if (event.event.which === 1) {
+            //     this._atlasDragged = false;
+            //     return false;
+            // }
+        };
     }
 
     return {
         restrict: 'E',
         replace: true,
         scope: {
-            zoom: '=',
         },
-        template: '<canvas></canvas>',
+        template: '<canvas tabindex="1"></canvas>',
         link: link,
     };
 }]);

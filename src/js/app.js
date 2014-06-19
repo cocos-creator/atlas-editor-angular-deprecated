@@ -13,7 +13,7 @@ angular.module('atlasEditor', ['fireUI'])
 .factory ( '$editor', function () {
     var editor = {};
     editor.elementBgColor = new FIRE.Color( 0, 0.28, 1, 0.5 );
-    editor.elementSelectColor = new FIRE.Color(0,0,0,1);
+    editor.elementSelectColor = new FIRE.Color(1,1,0,1);
 
     return editor;
 })

@@ -174,15 +174,13 @@ angular.module('atlasEditor')
         $scope.atlasHandlerLayer.activate();
         for ( var i = 0; i < items.length; ++i ) {
             var item = items[i];
-            var strokeWidth = 2;
-            var outlineBounds = item.data.bgItem.bounds.expand(strokeWidth);
-            var outline = new paper.Shape.Rectangle(outlineBounds);
+            var outline = new paper.Shape.Rectangle();
             outline.style = {
-                strokeColor: 'white',
-                strokeWidth: strokeWidth,
+                strokeWidth: 2,
             };
             item.data.outline = outline;
         }
+        $scope.paint();
     } );
 
     $scope.$on( 'unselect', function ( event, items ) { 
@@ -193,6 +191,7 @@ angular.module('atlasEditor')
                 item.data.outline = null;
             }
         }
+        $scope.paint();
     } );
 
     //
@@ -312,7 +311,6 @@ angular.module('atlasEditor')
 
     //
     $scope.paint = function () {
-        var posFilter = Math.round;
         var children = $scope.atlasLayer.children;
         for (var i = 0; i < children.length; ++i) {
             var child = children[i];
@@ -331,13 +329,13 @@ angular.module('atlasEditor')
                 child.pivot = [-tex.width * 0.5, -tex.height * 0.5];
                 child.rotation = 0;
             }
-            child.position = [posFilter(tex.x), posFilter(tex.y)];
+            child.position = [tex.x, tex.y];
 
             // update rectangle
-            var left = posFilter(tex.x);
-            var top = posFilter(tex.y);
-            var w = posFilter(tex.rotatedWidth);
-            var h = posFilter(tex.rotatedHeight);
+            var left = tex.x;
+            var top = tex.y;
+            var w = tex.rotatedWidth;
+            var h = tex.rotatedHeight;
             var bgItem = child.data.bgItem;
             bgItem.size = [w, h];
             bgItem.position = new paper.Rectangle(left, top, w, h).center;
@@ -346,14 +344,18 @@ angular.module('atlasEditor')
             // update outline
             var outline = child.data.outline;
             if (outline) {
+                var outlineBounds = bgItem.bounds;
+                var strokeWidth = 2;
+                outlineBounds = outlineBounds.expand(-strokeWidth/$scope.curZoom);
                 outline.position = [
-                    bgItem.position.x*$scope.curZoom, 
-                    bgItem.position.y*$scope.curZoom
+                    outlineBounds.center.x*$scope.curZoom, 
+                    outlineBounds.center.y*$scope.curZoom
                 ];
                 outline.size = [
-                    w*$scope.curZoom, 
-                    h*$scope.curZoom
+                    outlineBounds.width*$scope.curZoom, 
+                    outlineBounds.height*$scope.curZoom
                 ];
+                outline.strokeColor = PaperUtils.color($scope.editor.elementSelectColor);
             }
         }
     };

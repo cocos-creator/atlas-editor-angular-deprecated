@@ -31,6 +31,7 @@ angular.module('atlasEditor')
 
     $scope.atlas = $atlas.data;
     $scope.editor = $editor;
+    $scope.curZoom = 1.0;
 
     $scope.$watchGroup ( [
         'atlas.width', 
@@ -70,7 +71,7 @@ angular.module('atlasEditor')
     ], function ( val, old ) {
         $scope.atlas.sort();
         $scope.atlas.layout();
-        $scope.paintAtlas();
+        $scope.paint();
         $scope.project.view.update();
     }); 
 
@@ -84,7 +85,7 @@ angular.module('atlasEditor')
         'editor.elementSelectColor.b',
         'editor.elementSelectColor.a',
     ], function ( val, old ) {
-        $scope.paintAtlas();
+        $scope.paint();
         $scope.project.view.update();
     }); 
 
@@ -96,12 +97,15 @@ angular.module('atlasEditor')
 
         $scope.atlasBGLayer = PaperUtils.createLayer();
         $scope.atlasBGLayer.position = [-$scope.atlas.width*0.5, -$scope.atlas.height*0.5];
-        $scope.atlasLayer = PaperUtils.createLayer(); // to draw atlas bounds & texture
+        $scope.atlasLayer = PaperUtils.createLayer();
         $scope.atlasLayer.position = [-$scope.atlas.width*0.5, -$scope.atlas.height*0.5];
+        $scope.atlasHandlerLayer = PaperUtils.createLayer();
+        $scope.atlasHandlerLayer.position = [-$scope.atlas.width*0.5, -$scope.atlas.height*0.5];
 
-        sceneLayer.addChildren ([
+        $scope.sceneLayer.addChildren ([
             $scope.atlasBGLayer,
             $scope.atlasLayer,
+            $scope.atlasHandlerLayer,
         ]);
 
         // init atlas-bg-layer
@@ -131,7 +135,7 @@ angular.module('atlasEditor')
     });
 
     $scope.$on( 'paint', function ( event ) { 
-        $scope.paintAtlas();
+        $scope.paint();
     } );
 
     $scope.$on( 'dragenter', function () { 
@@ -158,9 +162,37 @@ angular.module('atlasEditor')
         $scope.import(files);
     } );
 
-    $scope.$on( 'zoomChanged', function () { 
-        // $scope.atlasLayer.scale( 1.0/$scope.atlasLayer.globalMatrix.scaling.x,
-        //                          1.0/$scope.atlasLayer.globalMatrix.scaling.y );
+    $scope.$on( 'zoomChanged', function ( event, zoom) { 
+        $scope.curZoom = zoom;
+        $scope.atlasHandlerLayer.scale( 1.0/$scope.atlasHandlerLayer.globalMatrix.scaling.x,
+                                        1.0/$scope.atlasHandlerLayer.globalMatrix.scaling.y );
+        $scope.paint();
+        $scope.project.view.update();
+    } );
+
+    $scope.$on( 'select', function ( event, items ) { 
+        $scope.atlasHandlerLayer.activate();
+        for ( var i = 0; i < items.length; ++i ) {
+            var item = items[i];
+            var strokeWidth = 2;
+            var outlineBounds = item.data.bgItem.bounds.expand(strokeWidth);
+            var outline = new paper.Shape.Rectangle(outlineBounds);
+            outline.style = {
+                strokeColor: 'white',
+                strokeWidth: strokeWidth,
+            };
+            item.data.outline = outline;
+        }
+    } );
+
+    $scope.$on( 'unselect', function ( event, items ) { 
+        for ( var i = 0; i < items.length; ++i ) {
+            var item = items[i];
+            if ( item.data.outline ) {
+                item.data.outline.remove();
+                item.data.outline = null;
+            }
+        }
     } );
 
     //
@@ -223,41 +255,38 @@ angular.module('atlasEditor')
 
     //
     $scope.rebuildAtlas = function (forExport) {
-        var onMouseDown, onMouseUp;
         if (!forExport) {
-            onMouseDown = function (event) {
-                // if (event.event.which === 1 && !(event.modifiers.control || event.modifiers.command)) {
-                //     var index = $scope._selection.indexOf(this);
-                //     if (index == -1) {
-                //         _clearSelection($scope);
-                //         _selectAtlas($scope, this, event);
-                //     }
-                // }
-            };
-            onMouseUp = function (event) {
-                // if (event.event.which !== 1 || $scope._atlasDragged) {
-                //     return;
-                // }
-                // if ((event.modifiers.control || event.modifiers.command)) {
-                //     var index = $scope._selection.indexOf(this);
-                //     if (index != -1) {
-                //         $scope._selection.splice(index, 1);
-                //         this.data.outline.remove();
-                //         this.data.outline = null;
-                //         this.bringToFront();
-                //         return;
-                //     }
-                //     _selectAtlas($scope, this, event);
-                // }
-                // else {
-                //     _clearSelection($scope);
-                //     _selectAtlas($scope, this, event);
-                // }
-            };
+            // onMouseDown = function (event) {
+            //     if (event.event.which === 1 && !(event.modifiers.control || event.modifiers.command)) {
+            //         var index = $scope._selection.indexOf(this);
+            //         if (index == -1) {
+            //             _clearSelection($scope);
+            //             _selectAtlas($scope, this, event);
+            //         }
+            //     }
+            // };
+            // onMouseUp = function (event) {
+            //     if (event.event.which !== 1 || $scope._atlasDragged) {
+            //         return;
+            //     }
+            //     if ((event.modifiers.control || event.modifiers.command)) {
+            //         var index = $scope._selection.indexOf(this);
+            //         if (index != -1) {
+            //             $scope._selection.splice(index, 1);
+            //             this.data.outline.remove();
+            //             this.data.outline = null;
+            //             this.bringToFront();
+            //             return;
+            //         }
+            //         _selectAtlas($scope, this, event);
+            //     }
+            //     else {
+            //         _clearSelection($scope);
+            //         _selectAtlas($scope, this, event);
+            //     }
+            // };
 
             $scope.atlasLayer.removeChildren();
-            // $scope.selection.length = 0;
-
             $scope.atlasLayer.activate();
         }
 
@@ -265,28 +294,24 @@ angular.module('atlasEditor')
         for (i = 0; i < $scope.atlas.textures.length; ++i) {
             var tex = $scope.atlas.textures[i];
             var raster = PaperUtils.createSpriteRaster(tex);
+            raster.selectable = true;
             raster.data.texture = tex;
             raster.position = [tex.x, tex.y];
 
             if ( !forExport ) {
                 raster.data.bgItem = new paper.Shape.Rectangle(paper.Item.NO_INSERT);
-                $scope.bgLayer.addChild(raster.data.bgItem);
-
-                // raster.data.bgItem.insertBelow(raster);
-                // // bind events
-                // raster.onMouseDown = onMouseDown;
-                // raster.onMouseUp = onMouseUp;
+                raster.data.bgItem.insertBelow(raster);
             }
         }
 
         if (!forExport) {
-            $scope.paintAtlas();
+            $scope.paint();
         }
         $scope.project.view.update();
     };
 
     //
-    $scope.paintAtlas = function () {
+    $scope.paint = function () {
         var posFilter = Math.round;
         var children = $scope.atlasLayer.children;
         for (var i = 0; i < children.length; ++i) {
@@ -321,8 +346,14 @@ angular.module('atlasEditor')
             // update outline
             var outline = child.data.outline;
             if (outline) {
-                outline.position = bgItem.position;
-                outline.size = bgItem.size;
+                outline.position = [
+                    bgItem.position.x*$scope.curZoom, 
+                    bgItem.position.y*$scope.curZoom
+                ];
+                outline.size = [
+                    w*$scope.curZoom, 
+                    h*$scope.curZoom
+                ];
             }
         }
     };

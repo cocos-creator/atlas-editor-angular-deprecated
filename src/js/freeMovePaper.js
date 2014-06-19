@@ -52,14 +52,9 @@
             canvasEL.height = height;
 
             // resize
-            var view = scope.project.view;
-            var oldSize = view.viewSize;
-
-            view.viewSize = [width, height];
-            scope.sceneLayer.position = [ 
-                scope.sceneLayer.position.x * (width/oldSize.width), 
-                scope.sceneLayer.position.y * (height/oldSize.height)
-            ];
+            scope.project.view.viewSize = [width, height];
+            scope.rootLayer.position = [width * 0.5, height * 0.5];
+            scope.bgLayer.position = [width * 0.5, height * 0.5];
 
             scope.repaint();
         };
@@ -100,7 +95,7 @@
                 scope.zoom = zoom;
                 scope.rootLayer.scaling = [zoom, zoom];
                 scope.project.view.update();
-                scope.$emit('zoomChanged');
+                scope.$emit('zoomChanged', zoom);
             }
         };
 
@@ -155,7 +150,7 @@
 
         // fgLayer
         scope.fgLayer = PaperUtils.createLayer();
-        scope.fgLayer.position = [viewSize.width * 0.5, viewSize.height * 0.5];
+        scope.fgLayer.position = [0,0];
         scope.fgLayer.pivot = [0,0];
         scope.project.layers.push(scope.fgLayer);
 
@@ -164,8 +159,57 @@
             scope.sceneLayer,
         ]);
 
+        // create select rect
+        scope.fgLayer.activate();
+        scope.selectRect = new paper.Shape.Rectangle(0,0,0,0);
+        scope.selectRect.style = {
+            fillColor: new paper.Color(0, 0.5, 1.0, 0.5),
+            strokeColor: new paper.Color(0, 0.7, 1.0, 1.0),
+            strokeWidth: 1,
+        };
+
         scope.$emit( 'initScene', scope.project, scope.sceneLayer, scope.fgLayer, scope.bgLayer );
         scope.repaint();
+
+        scope.rectSelecting = false;
+        scope.rectSelectStartAt = [0,0];
+        scope.selection = [];
+
+        function toggleSelect ( item ) {
+            if ( !item )
+                return;
+
+            var idx = scope.selection.indexOf(item); 
+            if ( idx === -1 ) {
+                scope.$emit( 'select', [item] );
+                scope.selection.push(item);
+            }
+            else {
+                scope.$emit( 'unselect', [item] );
+                scope.selection.splice(idx,1);
+            }
+        }
+        function clearSelect () {
+            scope.$emit( 'unselect', scope.selection );
+            scope.selection = [];
+        }
+        function addSelect ( item ) {
+            // var idx = scope.selection.indexOf(item); 
+            // if ( idx === -1 ) {
+                scope.$emit( 'select', [item] );
+                scope.selection.push(item);
+            // }
+        }
+        function removeSelect ( item ) {
+            // var idx = scope.selection.indexOf(item); 
+            // if ( idx !== -1 ) {
+                scope.$emit( 'unselect', [item] );
+                scope.selection.splice(idx,1);
+            // }
+        }
+        function isSelected ( item ) {
+            return scope.selection.indexOf(item) !== -1; 
+        }
 
         // Debug:
         // scope.rootLayer.activate();
@@ -182,8 +226,13 @@
 
         //
         var tool = new paper.Tool();
+
+        // tool.onMouseMove = function (event) {
+        //     scope.project.view.update();
+        // };
+
         tool.onMouseDrag = function (event) {
-            // process drag
+            // process camera move
             var rightButtonDown = event.event.which === 3;
             rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
             if (rightButtonDown) {
@@ -196,17 +245,26 @@
                     scope.bgLayer.position.x + event.delta.x,
                     scope.bgLayer.position.y + event.delta.y,
                 ];
-                scope.fgLayer.position = [ 
-                    scope.fgLayer.position.x + event.delta.x,
-                    scope.fgLayer.position.y + event.delta.y,
-                ];
                 return;
             }
+
+            // process rect select
+            if ( event.event.which === 1 ) {
+                if ( scope.rectSelecting ) {
+                    var cursorPos = event.point.add(-0.5,-0.5);
+                    var rect = new paper.Rectangle(scope.rectSelectStartAt, cursorPos);
+                    scope.selectRect.position = rect.center;
+                    scope.selectRect.size = rect.size;
+
+                    return;
+                }
+            }
         };
+
         tool.onMouseDown = function (event) {
             canvasEL.focus();
 
-            // process drag
+            // process camera move
             var rightButtonDown = event.event.which === 3;
             rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
             if (rightButtonDown) {
@@ -215,15 +273,37 @@
                 return;
             }
 
-            // if (event.event.which === 1) {
-            //     if ((!event.item || event.item.layer !== this._atlasLayer) && !(event.modifiers.control || event.modifiers.command)) {
-            //         _clearSelection(this);
-            //         return false;
-            //     }
-            // }
+            // process rect select 
+            if ( event.event.which === 1 ) {
+                // process single item
+                if ( event.item && event.item.selectable ) {
+                    if ( event.modifiers.control || event.modifiers.command ) {
+                        toggleSelect(event.item);
+                        return;
+                    }
+
+                    if ( isSelected(event.item) ) {
+                        // TODO: dragging it
+                    }
+                    else {
+                        clearSelect();
+                        addSelect(event.item);
+                    }
+
+                    return;
+                }
+
+                // start rect select
+                if ( !(event.modifiers.control || event.modifiers.command) ) {
+                    clearSelect();
+                }
+                scope.rectSelecting = true;
+                scope.rectSelectStartAt = event.point.add(-0.5,-0.5);
+            }
         };
+
         tool.onMouseUp = function (event) {
-            // process drag release
+            // process camera move
             var rightButtonDown = event.event.which === 3;
             rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
             if (rightButtonDown) {
@@ -232,10 +312,17 @@
                 return;
             }
 
-            // if (event.event.which === 1) {
-            //     this._atlasDragged = false;
-            //     return false;
-            // }
+            // process rect select 
+            if ( event.event.which === 1 ) {
+                if ( scope.rectSelecting ) {
+                    scope.rectSelecting = false;
+                    scope.selectRect.position = [0,0]; 
+                    scope.selectRect.size = [0,0]; 
+
+                    // TODO: rectHitTest
+                    return;
+                }
+            }
         };
     }
 

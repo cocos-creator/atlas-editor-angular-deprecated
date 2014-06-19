@@ -171,6 +171,7 @@
         scope.$emit( 'initScene', scope.project, scope.sceneLayer, scope.fgLayer, scope.bgLayer );
         scope.repaint();
 
+        scope.draggingItems = false;
         scope.rectSelecting = false;
         scope.rectSelectStartAt = [0,0];
         scope.selection = [];
@@ -258,6 +259,11 @@
 
                     return;
                 }
+
+                if ( scope.draggingItems ) {
+                    scope.$emit('moveSelected', scope.selection, event.delta );
+                    return;
+                }
             }
         };
 
@@ -283,7 +289,9 @@
                     }
 
                     if ( isSelected(event.item) ) {
-                        // TODO: dragging it
+                        scope.draggingItems = true;
+                        canvasEL.style.cursor = 'crosshair';
+                        FIRE.addDragGhost("crosshair");
                     }
                     else {
                         clearSelect();
@@ -320,6 +328,13 @@
                     scope.selectRect.size = [0,0]; 
 
                     // TODO: rectHitTest
+                    return;
+                }
+
+                if ( scope.draggingItems ) {
+                    scope.draggingItems = false;
+                    canvasEL.style.cursor = 'auto';
+                    FIRE.removeDragGhost();
                     return;
                 }
             }

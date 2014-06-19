@@ -179,8 +179,12 @@ angular.module('atlasEditor')
                 strokeWidth: 2,
             };
             item.data.outline = outline;
+
+            item.data.bgItem.bringToFront();
+            item.bringToFront();
         }
         $scope.paint();
+        $scope.project.view.update();
     } );
 
     $scope.$on( 'unselect', function ( event, items ) { 
@@ -192,6 +196,18 @@ angular.module('atlasEditor')
             }
         }
         $scope.paint();
+        $scope.project.view.update();
+    } );
+
+    $scope.$on( 'moveSelected', function ( event, items, delta ) { 
+        for ( var i = 0; i < items.length; ++i ) {
+            var item = items[i];
+            var tex = item.data.texture;
+            tex.x = tex.x + delta.x/$scope.curZoom;
+            tex.y = tex.y + delta.y/$scope.curZoom;
+        }
+        $scope.paint();
+        $scope.project.view.update();
     } );
 
     //

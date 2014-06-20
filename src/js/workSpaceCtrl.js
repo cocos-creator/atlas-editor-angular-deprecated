@@ -42,6 +42,7 @@ angular.module('atlasEditor')
         //
         $scope.atlasBGLayer.position = [-$scope.atlas.width*0.5, -$scope.atlas.height*0.5];
         $scope.atlasLayer.position = [-$scope.atlas.width*0.5, -$scope.atlas.height*0.5];
+        $scope.atlasHandlerLayer.position = [-$scope.atlas.width*0.5, -$scope.atlas.height*0.5];
 
         //
         if ( $scope.checkerboard !== undefined ) {
@@ -224,8 +225,6 @@ angular.module('atlasEditor')
         };
         var processing = 0;
         var onload = function (event) {
-            console.log( event.target.filename );
-
             var img = new Image();
             img.classList.add('atlas-item');
 

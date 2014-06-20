@@ -171,6 +171,7 @@
         scope.$emit( 'initScene', scope.project, scope.sceneLayer, scope.fgLayer, scope.bgLayer );
         scope.repaint();
 
+        scope.draggingCanvas = false;
         scope.draggingItems = false;
         scope.rectSelecting = false;
         scope.rectSelectStartAt = [0,0];
@@ -298,15 +299,15 @@
         // path = new paper.Path.Line([0,0], [0,999]);
         // path.strokeColor = 'black';
 
-        var debugText = new paper.PointText({
-            point: [10, 20],
-            content: '',
-            fillColor: 'white',
-            fontFamily: 'Courier New',
-            fontWeight: 'normal',
-            fontSize: 15
-        });  
-        scope.fgLayer.addChild (debugText);
+        // var debugText = new paper.PointText({
+        //     point: [10, 20],
+        //     content: '',
+        //     fillColor: 'white',
+        //     fontFamily: 'Courier New',
+        //     fontWeight: 'normal',
+        //     fontSize: 15
+        // });  
+        // scope.fgLayer.addChild (debugText);
 
         //
         var tool = new paper.Tool();
@@ -337,9 +338,7 @@
 
         tool.onMouseDrag = function (event) {
             // process camera move
-            var rightButton = event.event.which === 3;
-            rightButton = rightButton || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
-            if (rightButton) {
+            if (scope.draggingCanvas) {
                 // drag viewport
                 scope.sceneLayer.position = [
                     scope.sceneLayer.position.x + event.delta.x / scope.zoom,
@@ -349,38 +348,41 @@
                     scope.bgLayer.position.x + event.delta.x,
                     scope.bgLayer.position.y + event.delta.y,
                 ];
-                return;
             }
 
             // process rect select
-            if ( event.event.which === 1 ) {
-                if ( scope.rectSelecting ) {
-                    var cursorPos = event.point.add(-0.5,-0.5);
-                    var rect = new paper.Rectangle(scope.rectSelectStartAt, cursorPos);
-                    scope.selectRect.position = rect.center;
-                    scope.selectRect.size = rect.size;
+            if ( scope.rectSelecting ) {
+                var cursorPos = event.point.add(-0.5,-0.5);
+                var rect = new paper.Rectangle(scope.rectSelectStartAt, cursorPos);
+                scope.selectRect.position = rect.center;
+                scope.selectRect.size = rect.size;
 
-                    doRectSelect(scope.sceneLayer);
-                    return;
-                }
+                doRectSelect(scope.sceneLayer);
+            }
 
-                if ( scope.draggingItems ) {
-                    scope.$emit('moveSelected', scope.selection, event.delta );
-                    return;
-                }
+            // process dragging item
+            if ( scope.draggingItems ) {
+                scope.$emit('moveSelected', scope.selection, event.delta );
             }
         };
 
         tool.onMouseDown = function (event) {
             canvasEL.focus();
 
+            if ( scope.draggingCanvas ||
+                 scope.rectSelecting ||
+                 scope.draggingItems )
+            {
+                return;
+            }
+
             // process camera move
             var rightButton = event.event.which === 3;
             rightButton = rightButton || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
             if (rightButton) {
+                scope.draggingCanvas = true;
                 canvasEL.style.cursor = 'move';
                 FIRE.addDragGhost("move");
-                return;
             }
 
             // process rect select 
@@ -389,60 +391,49 @@
                 if ( event.item && event.item.selectable ) {
                     if ( event.modifiers.control || event.modifiers.command ) {
                         toggleSelect(event.item);
-                        return;
-                    }
-
-                    if ( isSelected(event.item) ) {
-                        scope.draggingItems = true;
-                        canvasEL.style.cursor = 'pointer';
-                        FIRE.addDragGhost("pointer");
                     }
                     else {
-                        clearSelect();
-                        addSelect(event.item);
+                        if ( isSelected(event.item) ) {
+                            scope.draggingItems = true;
+                            canvasEL.style.cursor = 'pointer';
+                            FIRE.addDragGhost("pointer");
+                        }
+                        else {
+                            clearSelect();
+                            addSelect(event.item);
+                        }
                     }
-
-                    return;
                 }
-
-                // start rect select
-                if ( !(event.modifiers.control || event.modifiers.command) ) {
-                    clearSelect();
+                else {
+                    // start rect select
+                    if ( !(event.modifiers.control || event.modifiers.command) ) {
+                        clearSelect();
+                    }
+                    scope.rectSelecting = true;
+                    scope.rectSelectStartAt = event.point.add(-0.5,-0.5);
                 }
-                scope.rectSelecting = true;
-                scope.rectSelectStartAt = event.point.add(-0.5,-0.5);
             }
         };
 
         tool.onMouseUp = function (event) {
-            // process camera move
-            var rightButton = event.event.which === 3;
-            rightButton = rightButton || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
-            if (rightButton) {
+            if ( scope.draggingCanvas ) {
+                scope.draggingCanvas = false;
                 applyCursor(event);
                 FIRE.removeDragGhost();
-                return;
             }
+            if ( scope.rectSelecting ) {
+                confirmRectSelect(scope.sceneLayer);
 
-            // process rect select 
-            if ( event.event.which === 1 ) {
-                if ( scope.rectSelecting ) {
-                    confirmRectSelect(scope.sceneLayer);
-
-                    scope.rectSelecting = false;
-                    scope.selectRect.position = [0,0]; 
-                    scope.selectRect.size = [0,0]; 
-
-                    return;
-                }
-
-                if ( scope.draggingItems ) {
-                    scope.draggingItems = false;
-                    applyCursor(event);
-                    FIRE.removeDragGhost();
-                    return;
-                }
-
+                scope.rectSelecting = false;
+                scope.selectRect.position = [0,0]; 
+                scope.selectRect.size = [0,0]; 
+            }
+            else if ( scope.draggingItems ) {
+                scope.draggingItems = false;
+                applyCursor(event);
+                FIRE.removeDragGhost();
+            }
+            else {
                 applyCursor(event);
             }
         };

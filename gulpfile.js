@@ -25,8 +25,6 @@ var paths = {
         'src/js/freeMovePaper.js',
         'src/js/rightPanelCtrl.js',
         'src/js/workSpaceCtrl.js',
-
-        'src/js/editors.js',
     ],
     css: 'src/**/*.styl',
     html: 'src/**/*.html',

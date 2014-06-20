@@ -10,7 +10,7 @@
 <script src="ext/jquery/dist/jquery.min.js"></script>
 <script src="ext/angular/angular.min.js"></script>
 <script src="ext/paper/dist/paper-core.js"></script>
-<script src="ext/fire-core/core.min.js"></script>
+<script src="ext/fire-core/core.dev.js"></script>
 <script src="ext/fire-editor-ui/editor-ui.js"></script>
 <script src="ext/fire-editor-ui/editor-ui-templates.js"></script>
 <script src="bin/atlas-editor.js"></script>
@@ -49,6 +49,8 @@
     </div>
 
     <span class="space"></span>                                                                            
+    <fire-ui-field fi-name="Show Checkerboard" fi-bind="editor.showCheckerboard"></fire-ui-field>                         
+    <fire-ui-field fi-name="Background" fi-bind="editor.backgroundColor"></fire-ui-field>                         
     <fire-ui-field fi-name="Element Background" fi-bind="editor.elementBgColor"></fire-ui-field>                         
     <fire-ui-field fi-name="Element Select" fi-bind="editor.elementSelectColor"></fire-ui-field>                         
 

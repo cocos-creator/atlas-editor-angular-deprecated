@@ -14,6 +14,8 @@ angular.module('atlasEditor', ['fireUI'])
     var editor = {};
     editor.elementBgColor = new FIRE.Color( 0, 0.28, 1, 0.5 );
     editor.elementSelectColor = new FIRE.Color(1,1,0,1);
+    editor.backgroundColor = new FIRE.Color(0,0,0,0);
+    editor.showCheckerboard = true;
 
     return editor;
 })

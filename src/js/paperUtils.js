@@ -26,4 +26,39 @@ var PaperUtils;
         return new paper.Color(color.r, color.g, color.b, color.a);
     };
 
+    // check if rect contains, 1 is a contains b, -1 is b contains a, 0 is no contains 
+    PaperUtils.rectRectContains = function (a,b) {
+        if ( a.left <= b.left &&
+             a.right >= b.right &&
+             a.top <= b.top &&
+             a.bottom >= b.bottom )
+        {
+            // a contains b
+            return 1;
+        }
+        if ( b.left <= a.left &&
+             b.right >= a.right &&
+             b.top <= a.top &&
+             b.bottom >= a.bottom )
+        {
+            // b contains a
+            return -1;
+        }
+        return 0;
+    };
+
+    //
+    PaperUtils.rectRectIntersect = function (a,b) {
+        if ( (a.left <= b.left && a.right >= b.left) ||
+             (b.left <= a.left && b.right >= a.left ) ) 
+        {
+            if ( (a.top <= b.top && a.bottom >= b.top) ||
+                 (b.top <= a.top && b.bottom >= a.top ) ) 
+            {
+                return true;
+            }
+        }
+        return false;
+    };
+
 })(PaperUtils || (PaperUtils = {}));

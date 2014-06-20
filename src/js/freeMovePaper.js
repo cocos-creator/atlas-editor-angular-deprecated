@@ -175,7 +175,24 @@
         scope.rectSelecting = false;
         scope.rectSelectStartAt = [0,0];
         scope.selection = [];
+        scope.selectCandicates = [];
 
+        function isSelected ( item ) {
+            return scope.selection.indexOf(item) !== -1; 
+        }
+        function applyCursor ( event ) {
+            if ( event.modifiers.control || event.modifiers.command ) {
+                canvasEL.style.cursor = 'auto';
+                return;
+            }
+
+            if ( event.item && event.item.fm_selected ) {
+                canvasEL.style.cursor = 'pointer';
+            }
+            else {
+                canvasEL.style.cursor = 'auto';
+            }
+        }
         function toggleSelect ( item ) {
             if ( !item )
                 return;
@@ -208,8 +225,64 @@
                 scope.selection.splice(idx,1);
             // }
         }
-        function isSelected ( item ) {
-            return scope.selection.indexOf(item) !== -1; 
+        var transformSelectRect = null;
+        function doRectSelectRecrusively ( node ) {
+            for ( var i = 0; i < node.children.length; ++i ) {
+                var item = node.children[i];
+                if ( item.selectable ) {
+                    if ( item.className === 'Layer' ) {
+                        var selectRectTopLeft = item.globalMatrix.inverseTransform(scope.selectRect.bounds.topLeft);
+                        var selectRectBottomRight = item.globalMatrix.inverseTransform(scope.selectRect.bounds.bottomRight);
+                        transformSelectRect = new paper.Rectangle(selectRectTopLeft,selectRectBottomRight); 
+                        doRectSelectRecrusively(item);
+                    }
+                    else {
+                        if ( PaperUtils.rectRectContains( transformSelectRect, item.bounds ) !== 0 ||
+                             PaperUtils.rectRectIntersect( transformSelectRect, item.bounds ) )
+                        {
+                            if ( scope.selectCandicates.indexOf(item) === -1 ) {
+                                scope.selectCandicates.push(item);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        function doRectSelect ( node ) {
+            var i = -1;
+            var item = null;
+            for ( i = scope.selectCandicates.length-1; i >= 0; --i ) {
+                item = scope.selectCandicates[i];
+                if ( scope.selection.indexOf(item) !== -1 ) {
+                    scope.selectCandicates.splice(i,1);
+                }
+            }
+            scope.$emit( 'unselect', scope.selectCandicates );
+            scope.selectCandicates = [];
+            doRectSelectRecrusively (node);
+            scope.$emit( 'select', scope.selectCandicates );
+        }
+        function confirmRectSelect ( node ) {
+            var i = -1;
+            var item = null;
+            for ( i = scope.selectCandicates.length-1; i >= 0; --i ) {
+                item = scope.selectCandicates[i];
+                if ( scope.selection.indexOf(item) !== -1 ) {
+                    scope.selectCandicates.splice(i,1);
+                }
+            }
+            scope.$emit( 'unselect', scope.selectCandicates );
+            scope.selectCandicates = [];
+            doRectSelectRecrusively (node);
+            for ( i = 0; i < scope.selectCandicates.length; ++i ) {
+                item = scope.selectCandicates[i];
+                if ( scope.selection.indexOf(item) === -1 ) {
+                    scope.selection.push(item);
+                }
+            }
+            scope.selectCandicates = [];
+
+            scope.$emit( 'select', scope.selection );
         }
 
         // Debug:
@@ -225,18 +298,48 @@
         // path = new paper.Path.Line([0,0], [0,999]);
         // path.strokeColor = 'black';
 
+        var debugText = new paper.PointText({
+            point: [10, 20],
+            content: '',
+            fillColor: 'white',
+            fontFamily: 'Courier New',
+            fontWeight: 'normal',
+            fontSize: 15
+        });  
+        scope.fgLayer.addChild (debugText);
+
         //
         var tool = new paper.Tool();
+        var hoverItem = null; 
 
-        // tool.onMouseMove = function (event) {
-        //     scope.project.view.update();
-        // };
+        tool.onKeyDown = function (event) {
+            if ( event.key == 'command' || event.key == 'control' ) {
+                canvasEL.style.cursor = 'auto';
+            }
+        };
+
+        tool.onKeyUp = function (event) {
+            if ( event.key == 'command' || event.key == 'control' ) {
+                if ( hoverItem && hoverItem.fm_selected ) {
+                    canvasEL.style.cursor = 'pointer';
+                }
+                else {
+                    canvasEL.style.cursor = 'auto';
+                }
+            }
+        };
+
+        // NOTE: paper's mouse move will guarantee no mouse button press down.  
+        tool.onMouseMove = function (event) {
+            applyCursor(event);
+            hoverItem = event.item;
+        };
 
         tool.onMouseDrag = function (event) {
             // process camera move
-            var rightButtonDown = event.event.which === 3;
-            rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
-            if (rightButtonDown) {
+            var rightButton = event.event.which === 3;
+            rightButton = rightButton || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
+            if (rightButton) {
                 // drag viewport
                 scope.sceneLayer.position = [
                     scope.sceneLayer.position.x + event.delta.x / scope.zoom,
@@ -257,6 +360,7 @@
                     scope.selectRect.position = rect.center;
                     scope.selectRect.size = rect.size;
 
+                    doRectSelect(scope.sceneLayer);
                     return;
                 }
 
@@ -271,9 +375,9 @@
             canvasEL.focus();
 
             // process camera move
-            var rightButtonDown = event.event.which === 3;
-            rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
-            if (rightButtonDown) {
+            var rightButton = event.event.which === 3;
+            rightButton = rightButton || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
+            if (rightButton) {
                 canvasEL.style.cursor = 'move';
                 FIRE.addDragGhost("move");
                 return;
@@ -290,8 +394,8 @@
 
                     if ( isSelected(event.item) ) {
                         scope.draggingItems = true;
-                        canvasEL.style.cursor = 'crosshair';
-                        FIRE.addDragGhost("crosshair");
+                        canvasEL.style.cursor = 'pointer';
+                        FIRE.addDragGhost("pointer");
                     }
                     else {
                         clearSelect();
@@ -312,10 +416,10 @@
 
         tool.onMouseUp = function (event) {
             // process camera move
-            var rightButtonDown = event.event.which === 3;
-            rightButtonDown = rightButtonDown || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
-            if (rightButtonDown) {
-                canvasEL.style.cursor = 'auto';
+            var rightButton = event.event.which === 3;
+            rightButton = rightButton || (event.event.buttons !== 'undefined' && (event.event.buttons & 2) > 0); // tweak for firefox and IE
+            if (rightButton) {
+                applyCursor(event);
                 FIRE.removeDragGhost();
                 return;
             }
@@ -323,20 +427,23 @@
             // process rect select 
             if ( event.event.which === 1 ) {
                 if ( scope.rectSelecting ) {
+                    confirmRectSelect(scope.sceneLayer);
+
                     scope.rectSelecting = false;
                     scope.selectRect.position = [0,0]; 
                     scope.selectRect.size = [0,0]; 
 
-                    // TODO: rectHitTest
                     return;
                 }
 
                 if ( scope.draggingItems ) {
                     scope.draggingItems = false;
-                    canvasEL.style.cursor = 'auto';
+                    applyCursor(event);
                     FIRE.removeDragGhost();
                     return;
                 }
+
+                applyCursor(event);
             }
         };
     }

@@ -38,15 +38,11 @@
     <fire-ui-field fi-name="Contour Bleed" fi-bind="atlas.useContourBleed"></fire-ui-field>                         
     <fire-ui-field fi-name="Padding Bleed" fi-bind="atlas.usePaddingBleed"></fire-ui-field>                         
     <fire-ui-field fi-name="Custom Padding" fi-bind="atlas.customPadding" fi-type="int"></fire-ui-field>                         
-    <div class="fire-ui-field flex-row" tabindex="1">
-        <fire-ui-label>Build Color</fire-ui-label>
+    <fire-ui-custom-field fi-name="Build Color">
+        <fire-ui-checkbox fi-bind="atlas.customBuildColor"></fire-ui-checkbox>
         <span class="space"></span>                                     
-        <div class="flex-row flex-2">
-            <fire-ui-checkbox fi-bind="atlas.customBuildColor"></fire-ui-checkbox>
-            <span class="space"></span>                                     
-            <fire-ui-color class="flex-1" fi-bind="atlas.buildColor"></fire-ui-color>
-        </div>
-    </div>
+        <fire-ui-color class="flex-1" fi-bind="atlas.buildColor"></fire-ui-color>
+    </fire-ui-custom-field>                         
 
     <span class="space"></span>                                                                            
     <fire-ui-field fi-name="Show Checkerboard" fi-bind="editor.showCheckerboard"></fire-ui-field>                         

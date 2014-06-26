@@ -313,7 +313,7 @@ angular.module('atlasEditor')
         if (!forExport) {
             $scope.paint();
         }
-        $scope.project.view.update();
+        paper.view.update();
     };
 
     //
@@ -368,6 +368,14 @@ angular.module('atlasEditor')
                 outline.strokeColor = PaperUtils.color($scope.editor.elementSelectColor);
             }
         }
+    };
+
+    $scope.paintNewCanvas = function () {
+        var canvas = document.createElement("canvas");
+        paper.setup(canvas);
+        paper.view.viewSize = [$scope.atlas.width, $scope.atlas.height];
+        $scope.rebuildAtlas(true);
+        return canvas;
     };
 }])
 ;

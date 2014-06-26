@@ -1,4 +1,4 @@
-angular.module('atlasEditor')
+﻿angular.module('atlasEditor')
 .controller( "rightPanelCtrl", ["$scope", "$atlas", "$editor", function ($scope, $atlas, $editor) {
     $scope.sizeList = [ 
         { name: '128', value: 128 },
@@ -25,32 +25,33 @@ angular.module('atlasEditor')
     };
 
     $scope.export = function () {
-        // TODO
-        // window.navigator.saveBlob = window.navigator.saveBlob || window.navigator.msSaveBlob;
-        // // export json
-        // var json = FIRE.serialize($scope.atlas);
-        // var blob = new Blob([json], {type: "text/plain;charset=utf-8"});    // not support 'application/json'
-        // var name = 'atlas';
-        // if (window.navigator.saveBlob) {
-        //     window.navigator.saveBlob(blob, name + ".json");
-        // }
-        // else {
-        //     var jsonDataURL = (window.URL || window.webkitURL).createObjectURL(blob);
-        //     download(jsonDataURL, name + ".json");
-        // }
-        // // export png
-        // var canvas = $scope.atlasEditor.paintNewCanvas();
-        // canvas.toBlob = canvas.toBlob || canvas.msToBlob;
-        // window.BlobBuilder = window.BlobBuilder || window.MSBlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-        // if (window.BlobBuilder && canvas.toBlob && window.navigator.saveBlob) {
-        //     var blobBuilderObject = new BlobBuilder(); // Create a blob builder object so that we can append content to it.
-        //     blobBuilderObject.append(canvas.toBlob()); // Append the user's drawing in PNG format to the builder object.
-        //     window.navigator.saveBlob(blobBuilderObject.getBlob(), name + ".png"); // Move the builder object content to a blob and save it to a file.
-        // }
-        // else {
-        //     var pngDataURL = canvas.toDataURL("image/png");
-        //     download(pngDataURL, name + ".png");
-        // }
+        // 测试代码，需要整理
+        var editor = angular.element($("#workspace")).scope();
+        window.navigator.saveBlob = window.navigator.saveBlob || window.navigator.msSaveBlob;
+        // export json
+        var json = FIRE.serialize($scope.atlas);
+        var blob = new Blob([json], { type: "text/plain;charset=utf-8" });    // not support 'application/json'
+        var name = 'atlas';
+        if (window.navigator.saveBlob) {
+            window.navigator.saveBlob(blob, name + ".json");
+        }
+        else {
+            var jsonDataURL = (window.URL || window.webkitURL).createObjectURL(blob);
+            download(jsonDataURL, name + ".json");
+        }
+        // export png
+        var canvas = editor.paintNewCanvas();
+        canvas.toBlob = canvas.toBlob || canvas.msToBlob;
+        window.BlobBuilder = window.BlobBuilder || window.MSBlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+        if (window.BlobBuilder && canvas.toBlob && window.navigator.saveBlob) {
+            var blobBuilderObject = new BlobBuilder(); // Create a blob builder object so that we can append content to it.
+            blobBuilderObject.append(canvas.toBlob()); // Append the user's drawing in PNG format to the builder object.
+            window.navigator.saveBlob(blobBuilderObject.getBlob(), name + ".png"); // Move the builder object content to a blob and save it to a file.
+        }
+        else {
+            var pngDataURL = canvas.toDataURL("image/png");
+            download(pngDataURL, name + ".png");
+        }
     };
 }])
 ;

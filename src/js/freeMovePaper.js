@@ -99,6 +99,10 @@
             }
         };
 
+        scope.setSmoothCanvas = function (enabled) {
+            canvasEL.getContext('2d').imageSmoothingEnabled = enabled;
+        };
+
         scope.setPos = function ( x, y ) {
             scope.sceneLayer.position = [x, y];
         };
@@ -109,6 +113,10 @@
 
         scope.$on( 'zoom', function ( event, zoom ) {
             scope.setZoom(zoom);
+        });
+
+        scope.$on( 'smoothCanvas', function ( event, enabled ) {
+            scope.setSmoothCanvas(enabled);
         });
 
         scope.$on ( 'repaint', function ( event, repaintAll ) {
@@ -131,6 +139,7 @@
 
         // init 
         paper.setup(canvasEL);
+        // NOTE: initialize should be here: canvasEL.getContext('2d').imageSmoothingEnabled = enabled;
         scope.project = paper.project;
         scope.project.view.viewSize = viewSize; // to prevent canvas resizing during paper.setup
 

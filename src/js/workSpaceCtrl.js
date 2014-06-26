@@ -99,6 +99,11 @@ angular.module('atlasEditor')
         $scope.checkerboard.visible = val;
         $scope.project.view.update();
     });
+    $scope.$watch ( 'editor.smoothCanvas',
+    function ( val, old ) {
+        $scope.$broadcast( 'smoothCanvas', val );
+        $scope.$broadcast( 'repaint', true );
+    });
 
     $scope.$on( 'initScene', function ( event, project, sceneLayer, fgLayer, bgLayer ) { 
         $scope.project = project;

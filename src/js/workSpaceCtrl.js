@@ -1,4 +1,4 @@
-angular.module('atlasEditor')
+﻿angular.module('atlasEditor')
 .controller( "workSpaceCtrl", ["$scope", "$element", "$atlas", "$editor", function ($scope, $element, $atlas, $editor) {
     //
     function createCheckerboard ( width, height ) {
@@ -237,7 +237,6 @@ angular.module('atlasEditor')
         var onload = function (event) {
             var img = new Image();
             img.classList.add('atlas-item');
-
             img.onload = function () {
                 var texture = new FIRE.SpriteTexture(img);
                 texture.name = event.target.filename;
@@ -252,9 +251,15 @@ angular.module('atlasEditor')
 
                 $scope.atlas.add(texture);
                 processing -= 1;
+                
+                // checkIfFinished
+                if ( processing === 0 ) {
+                    $scope.atlas.sort();
+                    $scope.atlas.layout();
+                    $scope.rebuildAtlas(false);
+                }
             };
-
-            img.src = event.target.result;
+            img.src = event.target.result;  // 这里的dataURL是原始数据，但Image填充到画布上后，透明像素的部分会变成黑色。
         };
 
         for (var i = 0; i < files.length; ++i) {
@@ -268,18 +273,6 @@ angular.module('atlasEditor')
                 reader.readAsDataURL(file);
             }
         }
-
-        //
-        var checkIfFinished = function () {
-            if ( processing === 0 ) {
-                $scope.atlas.sort();
-                $scope.atlas.layout();
-                $scope.rebuildAtlas(false);
-                return;
-            }
-            setTimeout( checkIfFinished, 500 );
-        };
-        checkIfFinished();
     };
 
     //

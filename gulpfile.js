@@ -105,7 +105,7 @@ gulp.task('watch', function() {
     gulp.watch(paths.img, ['cp-img']).on ( 'error', gutil.log );
     gulp.watch(paths.js, ['js-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.css, ['css']).on ( 'error', gutil.log );
-    gulp.watch(paths.html, ['html']).on ( 'error', gutil.log );
+    // gulp.watch(paths.html, ['html']).on ( 'error', gutil.log );
 });
 
 // tasks

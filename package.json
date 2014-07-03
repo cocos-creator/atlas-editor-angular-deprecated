@@ -1,10 +1,16 @@
 {
-    "name": "simple-server",
-    "version": "0.1.0",
-    "description": "Simple Web Server",
-    "homepage": "http://jwu.github.io",
+    "name": "atlas-editor",
+    "version": "0.0.1",
+    "description": "Atlas Editor",
+    "homepage": "https://github.com/fireball-x/atlas-editor",
     "license": "MIT",
     "licenseUrl": "http://opensource.org/licenses/MIT",
+    "main": "index.html",
+    "window": {
+        "toolbar": false,
+        "width": 1280,
+        "height": 720
+    },
     "dependencies": {
         "express": ""
     },

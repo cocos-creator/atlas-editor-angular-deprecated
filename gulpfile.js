@@ -17,9 +17,14 @@ var paths = {
     ext_editor_ui: [ 
         '../editor-ui/bin/**/*',
     ],
+    ext: 'src/third/pngcrush_modified.js',
     img: 'src/img/**/*',
     js: 'src/**/*.js',
     js_in_order: [
+        'src/js/libpngWrapper.js',
+        //'src/third/pinger.js',
+        //'src/third/usain-png/deflate.js',
+        //'src/third/usain-png/usain-png.js',
         'src/js/paperUtils.js',
         'src/js/app.js',
         'src/js/freeMovePaper.js',
@@ -46,6 +51,11 @@ gulp.task('cp-core', function() {
 gulp.task('cp-editor-ui', function() {
     return gulp.src(paths.ext_editor_ui)
     .pipe(gulp.dest('ext/fire-editor-ui'))
+    ;
+});
+gulp.task('cp-3rd', function() {
+    return gulp.src(paths.ext)
+    .pipe(gulp.dest('ext'))
     ;
 });
 gulp.task('cp-img', function() {
@@ -102,6 +112,7 @@ gulp.task('css', function() {
 gulp.task('watch', function() {
     gulp.watch(paths.ext_core, ['cp-core']).on ( 'error', gutil.log );
     gulp.watch(paths.ext_editor_ui, ['cp-editor-ui']).on ( 'error', gutil.log );
+    gulp.watch(paths.ext, ['cp-3rd']).on ( 'error', gutil.log );
     gulp.watch(paths.img, ['cp-img']).on ( 'error', gutil.log );
     gulp.watch(paths.js, ['js-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.css, ['css']).on ( 'error', gutil.log );
@@ -109,5 +120,5 @@ gulp.task('watch', function() {
 });
 
 // tasks
-gulp.task('default', ['cp-core', 'cp-editor-ui', 'cp-img', 'js', 'css' ] );
+gulp.task('default', ['cp-core', 'cp-editor-ui', 'cp-img', 'cp-3rd', 'js', 'css' ] );
 gulp.task('all', ['default'] );

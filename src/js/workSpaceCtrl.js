@@ -231,6 +231,7 @@
         var acceptedTypes = {
             'image/png': true,
             'image/jpeg': true,
+            'image/jpg': true,
             'image/gif': true
         };
         var processing = 0;
@@ -282,7 +283,7 @@
             $scope.atlasLayer.activate();
         }
 
-        var i = 0;
+        var i = 0, j = 0, len = 0;
         for (i = 0; i < $scope.atlas.textures.length; ++i) {
             var tex = $scope.atlas.textures[i];
             var raster = PaperUtils.createSpriteRaster(tex);
@@ -363,12 +364,23 @@
         }
     };
 
-    $scope.paintNewCanvas = function () {
-        var canvas = document.createElement("canvas");
+    $scope.export = function () {
+        var canvas = document.createElement('canvas');
         paper.setup(canvas);
         paper.view.viewSize = [$scope.atlas.width, $scope.atlas.height];
         $scope.rebuildAtlas(true);
-        return canvas;
+
+        var ctx = canvas.getContext('2d');
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        for (var i = 2, pixels = imageData.data, len = pixels.length; i < len; i += 4) {
+            //pixels[i] = 255;
+            //pixels[i+1] = 1;
+        }
+        
+        return {
+            canvas: canvas,
+            buffer: pixels,
+        };
     };
 }])
 ;

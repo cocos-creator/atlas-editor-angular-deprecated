@@ -27,46 +27,55 @@ angular.module('atlasEditor', ['fireUI'])
     document.ondrop = function(e) { e.preventDefault(); };
     document.ondragover = function(e) { e.preventDefault(); };
 
-    // TODO: node-webkit custom contextmenu
-    // function Menu(cutLabel, copyLabel, pasteLabel) {
-    //     var gui = require('nw.gui');
-    //     var menu = new gui.Menu();
+    var isnw = process && process.versions && process.versions['node-webkit'];
+    if ( isnw ) {
+        var nw = require('nw.gui');
+        win = nw.Window.get();
+        var nativeMenuBar = new nw.Menu({ type: "menubar" });
+        nativeMenuBar.createMacBuiltin("Atlas Editor");
+        win.menu = nativeMenuBar;
 
-    //     var cut = new gui.MenuItem({
-    //         label: cutLabel || "Cut", 
-    //         click: function() {
-    //           document.execCommand("cut");
-    //           console.log('Menu:', 'cutted to clipboard');
-    //         }
-    //     });
+        // TODO: node-webkit custom contextmenu
+        // function Menu(cutLabel, copyLabel, pasteLabel) {
+        //     var gui = require('nw.gui');
+        //     var menu = new gui.Menu();
 
-    //     var copy = new gui.MenuItem({
-    //         label: copyLabel || "Copy",
-    //         click: function() {
-    //           document.execCommand("copy");
-    //           console.log('Menu:', 'copied to clipboard');
-    //         }
-    //     });
+        //     var cut = new gui.MenuItem({
+        //         label: cutLabel || "Cut", 
+        //         click: function() {
+        //           document.execCommand("cut");
+        //           console.log('Menu:', 'cutted to clipboard');
+        //         }
+        //     });
 
-    //     var paste = new gui.MenuItem({
-    //         label: pasteLabel || "Paste",
-    //         click: function() {
-    //           document.execCommand("paste");
-    //           console.log('Menu:', 'pasted to textarea');
-    //         }
-    //     });
+        //     var copy = new gui.MenuItem({
+        //         label: copyLabel || "Copy",
+        //         click: function() {
+        //           document.execCommand("copy");
+        //           console.log('Menu:', 'copied to clipboard');
+        //         }
+        //     });
 
-    //     menu.append(cut);
-    //     menu.append(copy);
-    //     menu.append(paste);
+        //     var paste = new gui.MenuItem({
+        //         label: pasteLabel || "Paste",
+        //         click: function() {
+        //           document.execCommand("paste");
+        //           console.log('Menu:', 'pasted to textarea');
+        //         }
+        //     });
 
-    //     return menu;
-    // }
+        //     menu.append(cut);
+        //     menu.append(copy);
+        //     menu.append(paste);
 
-    // var menu = new Menu([> pass cut, copy, paste labels if you need i18n<]);
-    // $(document).on("contextmenu", function(e) {
-    //     e.preventDefault();
-    //     menu.popup(e.originalEvent.x, e.originalEvent.y);
-    // });
+        //     return menu;
+        // }
+
+        // var menu = new Menu([> pass cut, copy, paste labels if you need i18n<]);
+        // $(document).on("contextmenu", function(e) {
+        //     e.preventDefault();
+        //     menu.popup(e.originalEvent.x, e.originalEvent.y);
+        // });
+    }
 }])
 ;

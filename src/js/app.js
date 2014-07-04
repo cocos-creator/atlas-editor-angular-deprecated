@@ -28,13 +28,23 @@ angular.module('atlasEditor', ['fireUI'])
     document.ondragover = function(e) { e.preventDefault(); };
 
     if ( FIRE.isnw ) {
-        var nw = require('nw.gui');
+        var nwgui = require('nw.gui');
+        var nativeWin = nwgui.Window.get();
+
         if (process.platform === 'darwin') {
-            win = nw.Window.get();
-            var nativeMenuBar = new nw.Menu({ type: "menubar" });
+            var nativeMenuBar = new nwgui.Menu({ type: "menubar" });
             nativeMenuBar.createMacBuiltin("Atlas Editor");
-            win.menu = nativeMenuBar;
+            nativeWin.menu = nativeMenuBar;
         }
+
+        $(document).keydown(function (e) { 
+            // F12
+            if ( e.keyCode == 123 ) {
+                nativeWin.showDevTools(); 
+                e.stopPropagation();
+            }
+        });
+
         // TODO: node-webkit custom contextmenu
         // function Menu(cutLabel, copyLabel, pasteLabel) {
         //     var gui = require('nw.gui');

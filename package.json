@@ -19,10 +19,10 @@
         "gulp-util": "",
         "gulp-clean": "",
         "gulp-jshint": "",
-        "jshint-stylish": "",
         "gulp-concat": "",
         "gulp-uglify": "",
         "gulp-stylus": "",
-        "gulp-angular-templatecache": ""
+        "gulp-angular-templatecache": "",
+        "jshint-stylish": ""
     }
 }

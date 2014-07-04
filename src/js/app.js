@@ -27,8 +27,7 @@ angular.module('atlasEditor', ['fireUI'])
     document.ondrop = function(e) { e.preventDefault(); };
     document.ondragover = function(e) { e.preventDefault(); };
 
-    var isnw = typeof(process) !== 'undefined' && process.versions && process.versions['node-webkit'];
-    if ( isnw ) {
+    if ( FIRE.isnw ) {
         var nw = require('nw.gui');
         if (process.platform === 'darwin') {
             win = nw.Window.get();

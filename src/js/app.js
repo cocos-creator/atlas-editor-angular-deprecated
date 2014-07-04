@@ -30,11 +30,12 @@ angular.module('atlasEditor', ['fireUI'])
     var isnw = typeof(process) !== 'undefined' && process.versions && process.versions['node-webkit'];
     if ( isnw ) {
         var nw = require('nw.gui');
-        win = nw.Window.get();
-        var nativeMenuBar = new nw.Menu({ type: "menubar" });
-        nativeMenuBar.createMacBuiltin("Atlas Editor");
-        win.menu = nativeMenuBar;
-
+        if (process.platform === 'darwin') {
+            win = nw.Window.get();
+            var nativeMenuBar = new nw.Menu({ type: "menubar" });
+            nativeMenuBar.createMacBuiltin("Atlas Editor");
+            win.menu = nativeMenuBar;
+        }
         // TODO: node-webkit custom contextmenu
         // function Menu(cutLabel, copyLabel, pasteLabel) {
         //     var gui = require('nw.gui');

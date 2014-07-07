@@ -74,10 +74,6 @@
         'atlas.allowRotate',
     ], function ( val, old ) {
         $atlas.layout();
-        // $scope.atlas.sort();
-        // $scope.atlas.layout();
-        // $scope.paint();
-        // $scope.project.view.update();
     }); 
 
     $scope.$watchGroup ( [
@@ -258,11 +254,8 @@
                 
                 // checkIfFinished
                 if ( processing === 0 ) {
-                    $scope.atlas.sort();
-                    $scope.atlas.layout();
-                    if ( $scope.atlas.autoSize ) {
-                        $scope.$apply();
-                    }
+                    $atlas.layout();
+                    $scope.$apply();
                     $scope.rebuildAtlas(false);
                 }
             };

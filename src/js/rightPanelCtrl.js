@@ -9,11 +9,19 @@
         { name: '4096', value: 4096 },
     ];
     $scope.atlas = $atlas.data;
+    $scope.atlas.width = 128;
+    $scope.atlas.height = 128;
     $scope.editor = $editor;
 
     $scope.layout = function () {
         $atlas.layout();
     };
+
+    $scope.$watch ( 'atlas.autoSize', function ( val, old ) {
+        if ( val ) {
+            $atlas.layout();
+        }
+    } );
 
     var download = function (url, filename) {
         var a = document.createElementNS("http://www.w3.org/1999/xhtml", "a");

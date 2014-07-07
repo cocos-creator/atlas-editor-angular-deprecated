@@ -37,7 +37,9 @@
         'atlas.width', 
         'atlas.height', 
     ], function ( val, old ) {
-        $scope.atlas.layout();
+        if ( $scope.atlas.autoSize === false ) {
+            $scope.atlas.layout();
+        }
 
         //
         $scope.atlasBGLayer.position = [-$scope.atlas.width*0.5, -$scope.atlas.height*0.5];
@@ -71,10 +73,11 @@
         'atlas.sortOrder',
         'atlas.allowRotate',
     ], function ( val, old ) {
-        $scope.atlas.sort();
-        $scope.atlas.layout();
-        $scope.paint();
-        $scope.project.view.update();
+        $atlas.layout();
+        // $scope.atlas.sort();
+        // $scope.atlas.layout();
+        // $scope.paint();
+        // $scope.project.view.update();
     }); 
 
     $scope.$watchGroup ( [
@@ -257,6 +260,9 @@
                 if ( processing === 0 ) {
                     $scope.atlas.sort();
                     $scope.atlas.layout();
+                    if ( $scope.atlas.autoSize ) {
+                        $scope.$apply();
+                    }
                     $scope.rebuildAtlas(false);
                 }
             };
@@ -360,6 +366,7 @@
                     outlineBounds.height*$scope.curZoom
                 ];
                 outline.strokeColor = PaperUtils.color($scope.editor.elementSelectColor);
+                outline.dashArray = [5,3];
             }
         }
     };

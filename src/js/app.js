@@ -3,12 +3,13 @@ angular.module('atlasEditor', ['fireUI'])
     var atlas = {};
     atlas.data = new FIRE.Atlas();
     atlas.layout = function () {
-        if ( atlas.data.autoSize ) {
-            atlas.data.width = 128;
-            atlas.data.height = 128;
+        var atlas = this.data;
+        if ( atlas.autoSize ) {
+            atlas.width = 128;
+            atlas.height = 128;
         }
-        this.data.sort();
-        this.data.layout();
+        atlas.sort();
+        atlas.layout();
         $rootScope.$broadcast( 'repaint', true );
     };
 

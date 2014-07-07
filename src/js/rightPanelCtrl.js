@@ -79,7 +79,7 @@
             window.BlobBuilder = window.BlobBuilder || window.MSBlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
             if (window.BlobBuilder && window.navigator.saveBlob) {
                 blobBuilderObject = new BlobBuilder(); // Create a blob builder object so that we can append content to it.
-                blobBuilderObject.append(blob);   // Append the user's drawing in PNG format to the builder object.
+                blobBuilderObject.append(new Uint8Array(png.data));   // Append the user's drawing in PNG format to the builder object.
                 window.navigator.saveBlob(blobBuilderObject.getBlob(), name + ".png"); // Move the builder object content to a blob and save it to a file.
             }
             else {

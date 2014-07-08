@@ -26,6 +26,7 @@ var paths = {
         //'src/third/usain-png/deflate.js',
         //'src/third/usain-png/usain-png.js',
         'src/js/paperUtils.js',
+        'src/js/utils.js',
         'src/js/app.js',
         'src/js/freeMovePaper.js',
         'src/js/rightPanelCtrl.js',

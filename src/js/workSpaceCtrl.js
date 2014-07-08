@@ -275,7 +275,7 @@
         }
     };
 
-    //
+    // if not exporting, just draw atlas to current paper project
     $scope.rebuildAtlas = function (forExport) {
         if (!forExport) {
             $scope.atlasLayer.removeChildren();
@@ -372,15 +372,13 @@
 
         var ctx = canvas.getContext('2d');
         var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        for (var i = 2, pixels = imageData.data, len = pixels.length; i < len; i += 4) {
-            //pixels[i] = 255;
-            //pixels[i+1] = 1;
-        }
+        var pixelBuffer = imageData.data;
         
+        pixelBuffer = Utils.applyBleed($scope.atlas, pixelBuffer);   // 这里应该是一个导出前才进行的操作，否则对像素的更改有可能被paper重绘时覆盖
+
         return {
             canvas: canvas,
-            buffer: pixels,
+            buffer: pixelBuffer,
         };
     };
-}])
-;
+}]);

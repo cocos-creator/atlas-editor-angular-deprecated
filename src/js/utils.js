@@ -63,6 +63,100 @@
         }
     };
     
+    // ------------------------------------------------------------------ 
+    /// prevents border artifacts due to bilinear filtering
+    /// Note: Shaders with bilinear filtering will sometimes sample outside the bounds
+    /// of the element, in the padding area, resulting in the padding color to bleed
+    /// around the rectangular borders of the element.  This is true even when padding is
+    /// purely transparent, because in that case, it is the 0 alpha that bleeds into the
+    /// alpha of the outer pixels.  Such alpha bleed is especially problematic when
+    /// trying to seamlessly tile multiple rectangular textures, as semi-transparent seams
+    /// will sometimes appear at different scales.  This method duplicates a single row of
+    /// pixels from the inner border of an element into the padding area.  This technique
+    /// can be used with all kinds of textures without risk, even textures with uneven
+    /// transparent edges, as it only allows the shader to sample more of the same (opaque
+    /// or transparent) values when it exceeds the bounds of the element.
+    // ------------------------------------------------------------------ 
+
+    var applyPaddingBleed = function (resultBuffer, srcBuffer, width, height, rect) {
+        if ( rect.width === 0 || rect.height === 0 )
+            return;
+        
+        var yMin = rect.y;
+        var yMax = rect.yMax - 1;
+        var xMin = rect.x;
+        var xMax = rect.xMax - 1;
+        
+        var pixelBytes = 4;
+        var ditch = width * pixelBytes;
+        var xBufMin = xMin * pixelBytes;
+        var xBufMax = xMax * pixelBytes;
+        var topRowStart = yMin * ditch;
+        var botRowStart = yMax * ditch;
+
+        var bufIdx = 0, bufEnd = 0;
+
+        // copy top row of pixels
+        if (yMin - 1 >= 0) {
+            bufIdx = topRowStart + xBufMin;
+            bufEnd = topRowStart + xBufMax;
+            for (; bufIdx <= bufEnd; ++bufIdx) {
+                resultBuffer[bufIdx - ditch] = srcBuffer[bufIdx];
+            }
+        }
+        // copy bottom row of pixels
+        if (yMax + 1 < height) {
+            bufIdx = botRowStart + xBufMin;
+            bufEnd = botRowStart + xBufMax;
+            for (; bufIdx <= bufEnd; ++bufIdx) {
+                resultBuffer[bufIdx + ditch] = srcBuffer[bufIdx];
+            }
+        }
+        // copy left column of pixels
+        if (xMin - 1 >= 0) {
+            bufIdx = topRowStart + xBufMin;
+            bufEnd = botRowStart + xBufMin;
+            for (; bufIdx <= bufEnd; bufIdx += ditch) {
+                resultBuffer[bufIdx - 4] = srcBuffer[bufIdx];
+                resultBuffer[bufIdx - 3] = srcBuffer[bufIdx + 1];
+                resultBuffer[bufIdx - 2] = srcBuffer[bufIdx + 2];
+                resultBuffer[bufIdx - 1] = srcBuffer[bufIdx + 3];
+            }
+        }
+        // copy right column of pixels
+        if (xMax + 1 < width) {
+            bufIdx = topRowStart + xBufMax;
+            bufEnd = botRowStart + xBufMax;
+            for (; bufIdx <= bufEnd; bufIdx += ditch) {
+                resultBuffer[bufIdx + 4] = srcBuffer[bufIdx];
+                resultBuffer[bufIdx + 5] = srcBuffer[bufIdx + 1];
+                resultBuffer[bufIdx + 6] = srcBuffer[bufIdx + 2];
+                resultBuffer[bufIdx + 7] = srcBuffer[bufIdx + 3];
+            }
+        }
+        // copy corners
+        if (xMin - 1 >= 0 && yMin - 1 >= 0) {
+            for (bufIdx = topRowStart + xBufMin, bufEnd = bufIdx + 4; bufIdx < bufEnd; bufIdx++) {
+                resultBuffer[bufIdx - ditch - pixelBytes] = srcBuffer[bufIdx];
+            }
+        }
+        if (xMax + 1 < width && yMin - 1 >= 0) {
+            for (bufIdx = topRowStart + xBufMax, bufEnd = bufIdx + 4; bufIdx < bufEnd; bufIdx++) {
+                resultBuffer[bufIdx - ditch + pixelBytes] = srcBuffer[bufIdx];
+            }
+        }
+        if (xMin - 1 >= 0 && yMax + 1 < height) {
+            for (bufIdx = botRowStart + xBufMin, bufEnd = bufIdx + 4; bufIdx < bufEnd; bufIdx++) {
+                resultBuffer[bufIdx + ditch - pixelBytes] = srcBuffer[bufIdx];
+            }
+        }
+        if (xMax + 1 < width && yMax + 1 < height) {
+            for (bufIdx = botRowStart + xBufMax, bufEnd = bufIdx + 4; bufIdx < bufEnd; bufIdx++) {
+                resultBuffer[bufIdx + ditch + pixelBytes] = srcBuffer[bufIdx];
+            }
+        }
+    }
+
     Utils.applyBleed = function (atlas, srcBuffer) {
         var resultBuffer = new Uint8ClampedArray(srcBuffer);
         if (atlas.useContourBleed) {
@@ -86,6 +180,11 @@
         }
         if (atlas.usePaddingBleed) {
             console.time("apply padding bleed");
+            for (var i = 0, tex = null; i < atlas.textures.length; i++) {
+                tex = atlas.textures[i];
+                applyPaddingBleed(resultBuffer, srcBuffer, atlas.width, atlas.height, 
+                                  new FIRE.Rect(tex.x, tex.y, tex.rotatedWidth, tex.rotatedHeight));
+            }
             console.timeEnd("apply padding bleed");
         }
         return resultBuffer;

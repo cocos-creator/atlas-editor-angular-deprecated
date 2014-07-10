@@ -178,9 +178,9 @@
     $scope.$on( 'drop', function () { 
         $scope.border.strokeColor = new paper.Color(0.08, 0.08, 0.08, 1);
         $scope.project.view.update();
-
-        var files = event.dataTransfer.files;
-        $scope.import(files);
+        FIRE.getDraggingFiles(event, function (files) {
+            $scope.import(files);
+        });
     } );
 
     $scope.$on( 'zoomChanged', function ( event, zoom) { 
@@ -237,10 +237,10 @@
         var onload = function (event) {
             var img = new Image();
             img.classList.add('atlas-item');
+            var filename = event.target.filename;   // this property may be deleted later
             img.onload = function () {
                 var texture = new FIRE.SpriteTexture(img);
-                texture.name = event.target.filename;
-
+                texture.name = filename;
                 if ($scope.atlas.trim) {
                     var trimRect = FIRE.getTrimRect(img, $scope.atlas.trimThreshold);
                     texture.trimX = trimRect.x;

@@ -231,7 +231,7 @@
             'image/png': true,
             'image/jpeg': true,
             'image/jpg': true,
-            'image/gif': true
+            'image/gif': true,
         };
         var processing = 0;
         var onload = function (event) {
@@ -248,7 +248,6 @@
                     texture.width = trimRect.width;
                     texture.height = trimRect.height;
                 }
-
                 $scope.atlas.add(texture);
                 processing -= 1;
                 
@@ -268,7 +267,6 @@
                 processing += 1;
                 var reader = new FileReader();
                 reader.filename = file.name;
-                reader.atlas = $scope.atlas;
                 reader.onload = onload; 
                 reader.readAsDataURL(file);
             }
@@ -374,6 +372,12 @@
         var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         var pixelBuffer = imageData.data;
         
+        //for (var i = 2; i < pixelBuffer.length; i+=4) {
+        //    if (pixelBuffer[i+1] === 0) {
+        //        pixelBuffer[i] = 255;
+        //    }
+        //}
+
         pixelBuffer = Utils.applyBleed($scope.atlas, pixelBuffer);   // 这里应该是一个导出前才进行的操作，否则对像素的更改有可能被paper重绘时覆盖
 
         return {

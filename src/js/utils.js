@@ -79,14 +79,14 @@
     // ------------------------------------------------------------------ 
 
     var applyPaddingBleed = function (resultBuffer, srcBuffer, width, height, rect) {
-        if ( rect.width === 0 || rect.height === 0 )
+        if (rect.width === 0 || rect.height === 0)
             return;
-        
+
         var yMin = rect.y;
         var yMax = rect.yMax - 1;
         var xMin = rect.x;
         var xMax = rect.xMax - 1;
-        
+
         var pixelBytes = 4;
         var ditch = width * pixelBytes;
         var xBufMin = xMin * pixelBytes;
@@ -155,10 +155,11 @@
                 resultBuffer[bufIdx + ditch + pixelBytes] = srcBuffer[bufIdx];
             }
         }
-    }
+    };
 
     Utils.applyBleed = function (atlas, srcBuffer) {
         var resultBuffer = new Uint8ClampedArray(srcBuffer);
+        var i = 0, tex = null;
         if (atlas.useContourBleed) {
             console.time("apply contour bleed");
             // init offsets
@@ -171,7 +172,7 @@
                 bufIdxOffsets[j] = sampleXOffsets[j] * pixelBytes + sampleYOffsets[j] * ditch;
             }
             // bleed elements
-            for (var i = 0, tex = null; i < atlas.textures.length; i++) {
+            for (i = 0, tex = null; i < atlas.textures.length; i++) {
                 tex = atlas.textures[i];
                 applyContourBleed(resultBuffer, srcBuffer, atlas.width, new FIRE.Rect(tex.x, tex.y, tex.rotatedWidth, tex.rotatedHeight), 
                                   sampleXOffsets, sampleYOffsets, bufIdxOffsets);
@@ -180,7 +181,7 @@
         }
         if (atlas.usePaddingBleed) {
             console.time("apply padding bleed");
-            for (var i = 0, tex = null; i < atlas.textures.length; i++) {
+            for (i = 0, tex = null; i < atlas.textures.length; i++) {
                 tex = atlas.textures[i];
                 applyPaddingBleed(resultBuffer, srcBuffer, atlas.width, atlas.height, 
                                   new FIRE.Rect(tex.x, tex.y, tex.rotatedWidth, tex.rotatedHeight));

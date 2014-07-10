@@ -52,14 +52,11 @@
         var canvas = data.canvas;
         var buffer = data.buffer;
         var pngDataURL, blobBuilderObject;
-        var encodeByCanvas = false;
+        var encodeByCanvas = false; // encodedByCanvas not contour bleeding
         if (encodeByCanvas) {
             canvas.toBlob = canvas.toBlob || canvas.msToBlob;
-            window.BlobBuilder = window.BlobBuilder || window.MSBlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-            if (window.BlobBuilder && canvas.toBlob && window.navigator.saveBlob) {
-                blobBuilderObject = new BlobBuilder(); // Create a blob builder object so that we can append content to it.
-                blobBuilderObject.append(canvas.toBlob()); // Append the user's drawing in PNG format to the builder object.
-                window.navigator.saveBlob(blobBuilderObject.getBlob(), name + ".png"); // Move the builder object content to a blob and save it to a file.
+            if (canvas.toBlob && window.navigator.saveBlob) {
+                window.navigator.saveBlob(canvas.toBlob(), name + ".png");
             }
             else {
                 pngDataURL = canvas.toDataURL("image/png");
@@ -84,11 +81,9 @@
             console.timeEnd('encode base64');
             
             // save png data
-            window.BlobBuilder = window.BlobBuilder || window.MSBlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-            if (window.BlobBuilder && window.navigator.saveBlob) {
-                blobBuilderObject = new BlobBuilder(); // Create a blob builder object so that we can append content to it.
-                blobBuilderObject.append(new Uint8Array(png.data));   // Append the user's drawing in PNG format to the builder object.
-                window.navigator.saveBlob(blobBuilderObject.getBlob(), name + ".png"); // Move the builder object content to a blob and save it to a file.
+            if (Blob && window.navigator.saveBlob) {
+                blob = new Blob([new Uint8Array(png.data)], {type: 'image/png'});
+                window.navigator.saveBlob(blob, name + ".png");
             }
             else {
                 pngDataURL = 'data:image/png;base64,' + pngDataURL;
